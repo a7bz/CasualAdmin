@@ -1,0 +1,29 @@
+namespace CasualAdmin.Domain.Entities;
+using SqlSugar;
+
+/// <summary>
+/// 基础实体类，包含多租户支持
+/// </summary>
+public abstract class BaseEntity
+{
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// 更新时间
+    /// </summary>
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// 是否删除
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// 租户ID，用于多租户隔离
+    /// </summary>
+    [SugarColumn(IsNullable = true, ColumnDescription = "租户ID")]
+    public Guid? TenantId { get; set; }
+}

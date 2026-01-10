@@ -1,0 +1,16 @@
+# .editorconfig
+root = true
+
+[*.cs]
+# 代码样式设置
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# using 指令
+dotnet_sort_system_directives_first = true:warning
+csharp_using_directive_placement = inside_namespace:warning
+
+# 移除未使用的 using
+dotnet_remove_unnecessary_using_directives = true:warning

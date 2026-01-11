@@ -1,8 +1,10 @@
 namespace CasualAdmin.Tests.API.Controllers;
 
+using AutoMapper;
 using CasualAdmin.API.Controllers;
 using CasualAdmin.Application.Commands.Auth;
 using CasualAdmin.Application.Interfaces.System;
+using CasualAdmin.Application.Models.DTOs.Responses.System;
 using CasualAdmin.Domain.Entities.System;
 using Moq;
 using Xunit;
@@ -15,6 +17,9 @@ public class AuthControllerTests
     private readonly Mock<IUserService> _userServiceMock;
     private readonly Mock<IAuthService> _authServiceMock;
     private readonly Mock<IRsaEncryptionService> _rsaEncryptionServiceMock;
+    private readonly Mock<IRoleService> _roleServiceMock;
+    private readonly Mock<IPermissionService> _permissionServiceMock;
+    private readonly Mock<IMapper> _mapperMock;
     private readonly AuthController _authController;
 
     /// <summary>
@@ -26,13 +31,25 @@ public class AuthControllerTests
         _userServiceMock = new Mock<IUserService>();
         _authServiceMock = new Mock<IAuthService>();
         _rsaEncryptionServiceMock = new Mock<IRsaEncryptionService>();
+        _roleServiceMock = new Mock<IRoleService>();
+        _permissionServiceMock = new Mock<IPermissionService>();
+        _mapperMock = new Mock<IMapper>();
 
         // 设置RSA解密服务的模拟行为
         _rsaEncryptionServiceMock.Setup(service => service.Decrypt(It.IsAny<string>())).Returns("decrypted_password");
         _rsaEncryptionServiceMock.Setup(service => service.GetPublicKey()).Returns("test_public_key");
 
+        // 设置Mapper的模拟行为，将SysUser转换为SysUserDto
+        _mapperMock.Setup(mapper => mapper.Map<SysUserDto>(It.IsAny<SysUser>())).Returns(new SysUserDto());
+
+        // 设置RoleService的模拟行为，返回空角色列表
+        _roleServiceMock.Setup(service => service.GetRolesByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync(new List<SysRole>());
+
+        // 设置PermissionService的模拟行为，返回空权限列表
+        _permissionServiceMock.Setup(service => service.GetPermissionsByRoleIdAsync(It.IsAny<Guid>())).ReturnsAsync(new List<SysPermission>());
+
         // 创建被测控制器实例
-        _authController = new AuthController(_userServiceMock.Object, _authServiceMock.Object, _rsaEncryptionServiceMock.Object);
+        _authController = new AuthController(_userServiceMock.Object, _authServiceMock.Object, _rsaEncryptionServiceMock.Object, _roleServiceMock.Object, _permissionServiceMock.Object, _mapperMock.Object);
     }
 
     /// <summary>

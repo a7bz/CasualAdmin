@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using SqlSugar;
 
 /// <summary>
@@ -31,9 +32,9 @@ public class SysDictItem : BaseEntity
     public string Value { get; set; } = string.Empty;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 排序

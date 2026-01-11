@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using SqlSugar;
 
 /// <summary>
@@ -59,9 +60,9 @@ public class SysMenu : BaseEntity
     public int Sort { get; set; } = 0;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 是否显示：0-隐藏，1-显示

@@ -1,9 +1,11 @@
 namespace CasualAdmin.Application.Models.DTOs.Responses.System;
+using CasualAdmin.Application.Models.DTOs;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 角色DTO
 /// </summary>
-public class SysRoleDto
+public class SysRoleDto : BaseDto
 {
     /// <summary>
     /// 角色ID
@@ -31,9 +33,9 @@ public class SysRoleDto
     public string Description { get; set; } = string.Empty;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 排序

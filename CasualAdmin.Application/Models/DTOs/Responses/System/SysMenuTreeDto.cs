@@ -1,19 +1,16 @@
 namespace CasualAdmin.Application.Models.DTOs.Responses.System;
+using CasualAdmin.Application.Models.DTOs;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 菜单树DTO
 /// </summary>
-public class SysMenuTreeDto
+public class SysMenuTreeDto : BaseTreeDto<SysMenuTreeDto>
 {
     /// <summary>
     /// 菜单ID
     /// </summary>
     public Guid MenuId { get; set; }
-
-    /// <summary>
-    /// 父菜单ID
-    /// </summary>
-    public Guid? ParentId { get; set; }
 
     /// <summary>
     /// 菜单名称
@@ -51,9 +48,9 @@ public class SysMenuTreeDto
     public int Sort { get; set; } = 0;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 是否显示：0-隐藏，1-显示
@@ -69,9 +66,4 @@ public class SysMenuTreeDto
     /// 备注
     /// </summary>
     public string Remark { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 子菜单列表
-    /// </summary>
-    public List<SysMenuTreeDto> Children { get; set; } = [];
 }

@@ -1,4 +1,5 @@
 namespace CasualAdmin.Application.Models.DTOs.Requests.System;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 更新用户DTO
@@ -41,12 +42,12 @@ public class SysUserUpdateDto
     public Guid? RoleId { get; set; }
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 备注
     /// </summary>
-    public string Remark { get; set; } = string.Empty;
+    public string? Remark { get; set; }
 }

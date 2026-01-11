@@ -1,9 +1,11 @@
 namespace CasualAdmin.Application.Models.DTOs.Responses.System;
+using CasualAdmin.Application.Models.DTOs;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 菜单DTO
 /// </summary>
-public class SysMenuDto
+public class SysMenuDto : BaseDto
 {
     /// <summary>
     /// 菜单ID
@@ -51,9 +53,9 @@ public class SysMenuDto
     public int Sort { get; set; } = 0;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 是否显示：0-隐藏，1-显示

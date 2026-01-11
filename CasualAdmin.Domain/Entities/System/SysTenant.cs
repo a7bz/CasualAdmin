@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using SqlSugar;
 
 /// <summary>
@@ -44,9 +45,9 @@ public class SysTenant : BaseEntity
     public string? Email { get; set; }
 
     /// <summary>
-    /// 租户状态：0-禁用，1-启用
+    /// 租户状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 过期时间

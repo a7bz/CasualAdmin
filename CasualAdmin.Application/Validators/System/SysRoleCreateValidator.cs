@@ -30,7 +30,7 @@ public class SysRoleCreateValidator : AbstractValidator<SysRoleCreateDto>
 
         // 状态验证
         RuleFor(x => x.Status)
-            .InclusiveBetween(0, 1).WithMessage("状态只能是0或1");
+            .IsInEnum().WithMessage("状态值无效");
 
         // 排序验证
         RuleFor(x => x.Sort)

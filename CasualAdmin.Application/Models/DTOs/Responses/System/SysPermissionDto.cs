@@ -1,9 +1,11 @@
 namespace CasualAdmin.Application.Models.DTOs.Responses.System;
+using CasualAdmin.Application.Models.DTOs;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 权限DTO
 /// </summary>
-public class SysPermissionDto
+public class SysPermissionDto : BaseDto
 {
     /// <summary>
     /// 权限ID
@@ -21,9 +23,9 @@ public class SysPermissionDto
     public string PermissionCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// 权限类型：0-菜单权限，1-功能权限
+    /// 权限类型
     /// </summary>
-    public int PermissionType { get; set; } = 0;
+    public PermissionType PermissionType { get; set; } = PermissionType.Menu;
 
     /// <summary>
     /// 所属模块
@@ -36,9 +38,9 @@ public class SysPermissionDto
     public Guid? MenuId { get; set; }
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 排序

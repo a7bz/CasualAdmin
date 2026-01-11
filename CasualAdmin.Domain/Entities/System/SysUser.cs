@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using global::System.Text.Json.Serialization;
 using SqlSugar;
 
@@ -45,9 +46,9 @@ public class SysUser : BaseEntity
     public string Avatar { get; private set; } = string.Empty;
 
     /// <summary>
-    /// 性别：0-未知，1-男，2-女
+    /// 性别
     /// </summary>
-    public int Gender { get; private set; } = 0;
+    public Gender Gender { get; private set; } = Gender.Unknown;
 
     /// <summary>
     /// 生日
@@ -80,9 +81,9 @@ public class SysUser : BaseEntity
     public string Salt { get; private set; } = string.Empty;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; private set; } = 1;
+    public Status Status { get; private set; } = Status.Enabled;
 
     /// <summary>
     /// 最后登录时间
@@ -221,7 +222,7 @@ public class SysUser : BaseEntity
     /// </summary>
     public void Enable()
     {
-        Status = 1;
+        Status = Status.Enabled;
     }
 
     /// <summary>
@@ -229,7 +230,7 @@ public class SysUser : BaseEntity
     /// </summary>
     public void Disable()
     {
-        Status = 0;
+        Status = Status.Disabled;
     }
 
     /// <summary>

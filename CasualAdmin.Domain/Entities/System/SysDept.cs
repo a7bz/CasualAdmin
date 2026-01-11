@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using SqlSugar;
 
 /// <summary>
@@ -48,9 +49,9 @@ public class SysDept : BaseEntity
     public int Sort { get; private set; } = 0;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; private set; } = 1;
+    public Status Status { get; private set; } = Status.Enabled;
 
     /// <summary>
     /// 备注
@@ -148,7 +149,7 @@ public class SysDept : BaseEntity
     /// </summary>
     public void Enable()
     {
-        Status = 1;
+        Status = Status.Enabled;
     }
 
     /// <summary>
@@ -156,7 +157,7 @@ public class SysDept : BaseEntity
     /// </summary>
     public void Disable()
     {
-        Status = 0;
+        Status = Status.Disabled;
     }
 
     /// <summary>

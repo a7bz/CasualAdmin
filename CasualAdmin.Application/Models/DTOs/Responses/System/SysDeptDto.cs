@@ -1,9 +1,11 @@
 namespace CasualAdmin.Application.Models.DTOs.Responses.System;
+using CasualAdmin.Application.Models.DTOs;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
-/// 部门基本信息DTO
+/// 部门DTO
 /// </summary>
-public class SysDeptDto
+public class SysDeptDto : BaseDto
 {
     /// <summary>
     /// 部门ID
@@ -41,9 +43,9 @@ public class SysDeptDto
     public int Sort { get; set; } = 0;
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 备注

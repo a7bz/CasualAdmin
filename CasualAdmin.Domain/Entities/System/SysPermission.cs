@@ -1,4 +1,5 @@
 namespace CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Common;
 using SqlSugar;
 
 /// <summary>
@@ -26,9 +27,9 @@ public class SysPermission : BaseEntity
     public string PermissionCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// 权限类型：0-菜单权限，1-功能权限
+    /// 权限类型
     /// </summary>
-    public int PermissionType { get; set; } = 0;
+    public PermissionType PermissionType { get; set; } = PermissionType.Menu;
 
     /// <summary>
     /// 所属模块
@@ -42,9 +43,9 @@ public class SysPermission : BaseEntity
     public Guid? MenuId { get; set; }
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 排序

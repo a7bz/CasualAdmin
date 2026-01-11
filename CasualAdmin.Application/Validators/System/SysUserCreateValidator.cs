@@ -41,7 +41,7 @@ public class SysUserCreateValidator : AbstractValidator<SysUserCreateDto>
 
         // 状态验证
         RuleFor(x => x.Status)
-            .InclusiveBetween(0, 1).WithMessage("状态必须为0或1");
+            .IsInEnum().WithMessage("状态值无效");
 
         // 备注验证
         RuleFor(x => x.Remark)

@@ -1,4 +1,5 @@
 namespace CasualAdmin.Application.Models.DTOs.Requests.System;
+using CasualAdmin.Domain.Common;
 
 /// <summary>
 /// 更新角色DTO
@@ -23,12 +24,12 @@ public class SysRoleUpdateDto
     /// <summary>
     /// 角色描述
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
 
     /// <summary>
-    /// 状态：0-禁用，1-启用
+    /// 状态
     /// </summary>
-    public int Status { get; set; } = 1;
+    public Status Status { get; set; } = Status.Enabled;
 
     /// <summary>
     /// 排序

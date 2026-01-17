@@ -19,4 +19,11 @@ public interface IAuthService
     /// <param name="token">JWT Token</param>
     /// <returns>验证结果</returns>
     bool ValidateJwtToken(string token);
+
+    /// <summary>
+    /// 刷新JWT Token
+    /// </summary>
+    /// <param name="token">旧的JWT Token</param>
+    /// <returns>新的JWT Token</returns>
+    Task<string> RefreshJwtToken(string token);
 }

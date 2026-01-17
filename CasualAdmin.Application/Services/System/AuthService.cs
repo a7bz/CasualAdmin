@@ -14,16 +14,19 @@ public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
     private readonly IRoleService _roleService;
+    private readonly IUserService _userService;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="configuration">配置服务</param>
     /// <param name="roleService">角色服务</param>
-    public AuthService(IConfiguration configuration, IRoleService roleService)
+    /// <param name="userService">用户服务</param>
+    public AuthService(IConfiguration configuration, IRoleService roleService, IUserService userService)
     {
         _configuration = configuration;
         _roleService = roleService;
+        _userService = userService;
     }
 
     /// <summary>
@@ -98,6 +101,51 @@ public class AuthService : IAuthService
         catch
         {
             return false;
+        }
+    }
+
+    /// <summary>
+    /// 刷新JWT Token
+    /// </summary>
+    /// <param name="token">旧的JWT Token</param>
+    /// <returns>新的JWT Token</returns>
+    public async Task<string> RefreshJwtToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            throw new ArgumentNullException(nameof(token), "Token不能为空");
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtKey = _configuration["Jwt:Key"] ?? string.Empty;
+        var key = Encoding.UTF8.GetBytes(jwtKey);
+
+        try
+        {
+            // 验证旧token
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _configuration["Jwt:Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            // 从Claims中获取用户ID
+            var userIdClaim = principal.FindFirst(JwtRegisteredClaimNames.Sub) ?? throw new SecurityTokenException("Token中不包含用户ID");
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            // 获取用户信息
+            var user = await _userService.GetUserByIdAsync(userId) ?? throw new SecurityTokenException("用户不存在");
+
+            // 生成新token
+            return await GenerateJwtToken(user);
+        }
+        catch (Exception ex)
+        {
+            throw new SecurityTokenException("Token刷新失败", ex);
         }
     }
 }

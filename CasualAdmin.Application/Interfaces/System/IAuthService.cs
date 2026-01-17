@@ -19,11 +19,4 @@ public interface IAuthService
     /// <param name="token">JWT Token</param>
     /// <returns>验证结果</returns>
     bool ValidateJwtToken(string token);
-
-    /// <summary>
-    /// 从Token中获取用户ID
-    /// </summary>
-    /// <param name="token">JWT Token</param>
-    /// <returns>用户ID</returns>
-    Guid GetUserIdFromToken(string token);
 }

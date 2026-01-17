@@ -2,6 +2,7 @@ namespace CasualAdmin.Tests.Application.Services.System;
 using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Services.System;
 using CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Shared.Common;
 using global::System.IdentityModel.Tokens.Jwt;
 using global::System.Security.Claims;
 using global::System.Text;
@@ -146,7 +147,7 @@ public class AuthServiceTests
         var validToken = await _authService.GenerateJwtToken(user);
 
         // Act
-        var actualUserId = _authService.GetUserIdFromToken(validToken);
+        var actualUserId = JwtTokenHelper.GetUserIdFromToken(validToken);
 
         // Assert
         Assert.Equal(user.UserId, actualUserId);
@@ -162,10 +163,10 @@ public class AuthServiceTests
         var emptyToken = string.Empty;
 
         // Act
-        Func<Guid> act = () => _authService.GetUserIdFromToken(emptyToken);
+        Func<Guid> act = () => JwtTokenHelper.GetUserIdFromToken(emptyToken);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(() => _authService.GetUserIdFromToken(emptyToken));
+        Assert.Throws<ArgumentNullException>(() => JwtTokenHelper.GetUserIdFromToken(emptyToken));
     }
 
     /// <summary>
@@ -178,7 +179,7 @@ public class AuthServiceTests
         var invalidToken = "InvalidToken1234567890";
 
         // Act & Assert
-        Assert.ThrowsAny<Exception>(() => _authService.GetUserIdFromToken(invalidToken));
+        Assert.ThrowsAny<Exception>(() => JwtTokenHelper.GetUserIdFromToken(invalidToken));
     }
 
     /// <summary>
@@ -207,10 +208,10 @@ public class AuthServiceTests
         var invalidToken = tokenHandler.WriteToken(token);
 
         // Act
-        Func<Guid> act = () => _authService.GetUserIdFromToken(invalidToken);
+        Func<Guid> act = () => JwtTokenHelper.GetUserIdFromToken(invalidToken);
 
         // Assert
-        var exception = Assert.Throws<ArgumentException>(() => _authService.GetUserIdFromToken(invalidToken));
+        var exception = Assert.Throws<ArgumentException>(() => JwtTokenHelper.GetUserIdFromToken(invalidToken));
         Assert.Contains("Token does not contain user ID", exception.Message);
     }
 }

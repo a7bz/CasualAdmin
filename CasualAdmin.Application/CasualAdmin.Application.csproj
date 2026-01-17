@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CasualAdmin.Domain\CasualAdmin.Domain.csproj" />
+    <ProjectReference Include="..\CasualAdmin.Shared\CasualAdmin.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

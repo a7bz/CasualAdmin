@@ -100,23 +100,4 @@ public class AuthService : IAuthService
             return false;
         }
     }
-
-    /// <summary>
-    /// 从Token中获取用户ID
-    /// </summary>
-    /// <param name="token">JWT Token</param>
-    /// <returns>用户ID</returns>
-    public Guid GetUserIdFromToken(string token)
-    {
-        if (string.IsNullOrEmpty(token))
-            throw new ArgumentNullException(nameof(token));
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-
-        if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
-            throw new ArgumentException("Invalid token");
-
-        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub) ?? throw new ArgumentException("Token does not contain user ID");
-        return Guid.Parse(userIdClaim.Value);
-    }
 }

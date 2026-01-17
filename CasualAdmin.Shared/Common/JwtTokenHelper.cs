@@ -1,7 +1,6 @@
+namespace CasualAdmin.Shared.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-
-namespace CasualAdmin.Shared.Common;
 
 /// <summary>
 /// JWT Token工具类，用于从token中获取用户信息
@@ -25,9 +24,9 @@ public static class JwtTokenHelper
         if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
             throw new ArgumentException("无效的token");
 
-        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub) 
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)
             ?? throw new ArgumentException("token中不包含用户ID");
-        
+
         return Guid.Parse(userIdClaim.Value);
     }
 
@@ -48,9 +47,9 @@ public static class JwtTokenHelper
         if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
             throw new ArgumentException("无效的token");
 
-        var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email) 
+        var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)
             ?? throw new ArgumentException("token中不包含邮箱");
-        
+
         return emailClaim.Value;
     }
 
@@ -71,9 +70,9 @@ public static class JwtTokenHelper
         if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
             throw new ArgumentException("无效的token");
 
-        var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Name) 
+        var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Name)
             ?? throw new ArgumentException("token中不包含用户名");
-        
+
         return usernameClaim.Value;
     }
 
@@ -95,7 +94,7 @@ public static class JwtTokenHelper
             throw new ArgumentException("无效的token");
 
         var roleClaims = jwtToken.Claims.Where(claim => claim.Type == ClaimTypes.Role);
-        return roleClaims.Select(claim => claim.Value).ToList();
+        return [.. roleClaims.Select(claim => claim.Value)];
     }
 
     /// <summary>
@@ -115,15 +114,15 @@ public static class JwtTokenHelper
         if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
             throw new ArgumentException("无效的token");
 
-        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub) 
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)
             ?? throw new ArgumentException("token中不包含用户ID");
-        
-        var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email) 
+
+        var emailClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)
             ?? throw new ArgumentException("token中不包含邮箱");
-        
-        var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Name) 
+
+        var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Name)
             ?? throw new ArgumentException("token中不包含用户名");
-        
+
         var roleClaims = jwtToken.Claims.Where(claim => claim.Type == ClaimTypes.Role);
         var roles = roleClaims.Select(claim => claim.Value).ToList();
 
@@ -151,32 +150,6 @@ public static class JwtTokenHelper
         if (!authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("Authorization头格式不正确，应为Bearer token");
 
-        return authorizationHeader.Substring("Bearer ".Length).Trim();
+        return authorizationHeader["Bearer ".Length..].Trim();
     }
-}
-
-/// <summary>
-/// Token用户信息对象
-/// </summary>
-public class TokenUserInfo
-{
-    /// <summary>
-    /// 用户ID
-    /// </summary>
-    public Guid UserId { get; set; }
-
-    /// <summary>
-    /// 邮箱
-    /// </summary>
-    public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 用户名
-    /// </summary>
-    public string Username { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 角色列表
-    /// </summary>
-    public List<string> Roles { get; set; } = new List<string>();
 }

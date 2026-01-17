@@ -20,6 +20,14 @@ builder.Services.ConfigureJwt(builder.Configuration);
 
 builder.Services.ConfigureSwagger();
 
+// 添加全局授权策略
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
 builder.Services.AddControllers();
 
 // 添加FluentValidation自动验证

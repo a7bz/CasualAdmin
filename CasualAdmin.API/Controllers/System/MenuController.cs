@@ -5,6 +5,7 @@ using CasualAdmin.Application.Models.DTOs.Requests.System;
 using CasualAdmin.Application.Models.DTOs.Responses.System;
 using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Shared.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class MenuController : ControllerBase
 {
     private readonly IMenuService _menuService;

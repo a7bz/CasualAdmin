@@ -1,4 +1,5 @@
 namespace CasualAdmin.API.Configurations;
+using CasualAdmin.API.Middleware;
 using CasualAdmin.Infrastructure.FileStorage;
 using Microsoft.Extensions.FileProviders;
 
@@ -43,15 +44,21 @@ public static class MiddlewareConfiguration
 
         app.UseRouting();
 
+        // 添加异常处理中间件
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+
         // 从配置文件中读取日志中间件选项
-        var loggingOptions = new Middleware.LoggingOptions();
+        var loggingOptions = new LoggingOptions();
         app.Configuration.GetSection("LoggingMiddleware").Bind(loggingOptions);
 
         // 启用请求日志中间件
-        app.UseMiddleware<Middleware.LoggingMiddleware>(loggingOptions);
+        app.UseMiddleware<LoggingMiddleware>(loggingOptions);
 
         // 添加认证和授权中间件
         app.UseAuthentication();
         app.UseAuthorization();
+
+        // 添加权限检查中间件
+        app.UsePermissionCheck();
     }
 }

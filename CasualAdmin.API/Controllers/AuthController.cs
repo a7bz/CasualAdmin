@@ -5,6 +5,7 @@ using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Models.DTOs.Responses.System;
 using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Shared.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
+[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -105,7 +107,7 @@ public class AuthController : ControllerBase
             permissionKeys.AddRange(permissions.Select(p => p.PermissionCode));
         }
         // 去重
-        permissionKeys = permissionKeys.Distinct().ToList();
+        permissionKeys = [.. permissionKeys.Distinct()];
 
         return ApiResponse<object>.Success(new
         {
@@ -159,7 +161,7 @@ public class AuthController : ControllerBase
             permissionKeys.AddRange(permissions.Select(p => p.PermissionCode));
         }
         // 去重
-        permissionKeys = permissionKeys.Distinct().ToList();
+        permissionKeys = [.. permissionKeys.Distinct()];
 
         return ApiResponse<object>.Success(new
         {
@@ -168,5 +170,32 @@ public class AuthController : ControllerBase
             Roles = roleDtos,
             PermissionKeys = permissionKeys
         }, "登录成功");
+    }
+
+    /// <summary>
+    /// 刷新Token
+    /// </summary>
+    /// <param name="refreshTokenCommand">刷新Token命令，包含旧Token</param>
+    /// <returns>新Token</returns>
+    [HttpPost("refresh-token")]
+    public async Task<ApiResponse<object>> RefreshToken([FromBody] RefreshTokenCommand refreshTokenCommand)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(refreshTokenCommand.Token))
+            {
+                return ApiResponse<object>.BadRequest("Token不能为空");
+            }
+
+            var newToken = await _authService.RefreshJwtToken(refreshTokenCommand.Token);
+            return ApiResponse<object>.Success(new
+            {
+                Token = newToken
+            }, "Token刷新成功");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<object>.BadRequest(ex.Message);
+        }
     }
 }

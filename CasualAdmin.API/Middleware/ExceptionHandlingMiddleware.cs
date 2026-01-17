@@ -1,5 +1,7 @@
 namespace CasualAdmin.API.Middleware;
+using System.Security.Authentication;
 using CasualAdmin.Shared.Common;
+using Microsoft.IdentityModel.Tokens;
 
 /// <summary>
 /// 异常处理中间件
@@ -52,10 +54,20 @@ public class ExceptionHandlingMiddleware
 
         var response = exception switch
         {
+            // 认证授权相关异常
+            SecurityTokenExpiredException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token已过期"),
+            SecurityTokenInvalidSignatureException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token签名无效"),
+            SecurityTokenInvalidIssuerException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token颁发者无效"),
+            SecurityTokenInvalidAudienceException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token受众无效"),
+            AuthenticationException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "认证失败"),
+            UnauthorizedAccessException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "未授权访问"),
+
+            // 其他常见异常
             ArgumentNullException => new ApiResponse<object>(StatusCodes.Status400BadRequest, "请求参数不能为空"),
             ArgumentException => new ApiResponse<object>(StatusCodes.Status400BadRequest, "请求参数无效"),
             KeyNotFoundException => new ApiResponse<object>(StatusCodes.Status404NotFound, "请求的资源不存在"),
-            UnauthorizedAccessException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "未授权访问"),
+
+            // 默认异常
             _ => new ApiResponse<object>(StatusCodes.Status500InternalServerError, "服务器内部错误，请稍后重试")
         };
 

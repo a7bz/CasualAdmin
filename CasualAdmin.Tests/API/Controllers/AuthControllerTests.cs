@@ -43,10 +43,10 @@ public class AuthControllerTests
         _mapperMock.Setup(mapper => mapper.Map<SysUserDto>(It.IsAny<SysUser>())).Returns(new SysUserDto());
 
         // 设置RoleService的模拟行为，返回空角色列表
-        _roleServiceMock.Setup(service => service.GetRolesByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync(new List<SysRole>());
+        _roleServiceMock.Setup(service => service.GetRolesByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync([]);
 
         // 设置PermissionService的模拟行为，返回空权限列表
-        _permissionServiceMock.Setup(service => service.GetPermissionsByRoleIdAsync(It.IsAny<Guid>())).ReturnsAsync(new List<SysPermission>());
+        _permissionServiceMock.Setup(service => service.GetPermissionsByRoleIdAsync(It.IsAny<Guid>())).ReturnsAsync([]);
 
         // 创建被测控制器实例
         _authController = new AuthController(_userServiceMock.Object, _authServiceMock.Object, _rsaEncryptionServiceMock.Object, _roleServiceMock.Object, _permissionServiceMock.Object, _mapperMock.Object);

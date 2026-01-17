@@ -18,6 +18,7 @@ public class AuthServiceTests
 {
     private readonly Mock<IConfiguration> _configurationMock;
     private readonly Mock<IRoleService> _roleServiceMock;
+    private readonly Mock<IUserService> _userServiceMock;
     private readonly AuthService _authService;
 
     /// <summary>
@@ -35,8 +36,11 @@ public class AuthServiceTests
         // 初始化模拟角色服务
         _roleServiceMock = new Mock<IRoleService>();
 
+        // 初始化模拟用户服务
+        _userServiceMock = new Mock<IUserService>();
+
         // 创建被测服务实例
-        _authService = new AuthService(_configurationMock.Object, _roleServiceMock.Object);
+        _authService = new AuthService(_configurationMock.Object, _roleServiceMock.Object, _userServiceMock.Object);
     }
 
     /// <summary>

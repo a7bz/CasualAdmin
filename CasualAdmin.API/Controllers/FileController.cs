@@ -1,8 +1,8 @@
 namespace CasualAdmin.API.Controllers;
+
 using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Application.Models.File;
 using CasualAdmin.Shared.Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-[Authorize]
 public class FileController : ControllerBase
 {
     private readonly IFileStorageService _fileStorageService;

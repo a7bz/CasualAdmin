@@ -20,11 +20,31 @@ builder.Services.ConfigureJwt(builder.Configuration);
 
 builder.Services.ConfigureSwagger();
 
+// 注册授权排除路径配置
+builder.Services.AddSingleton(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var excludePaths = new AuthorizationExcludePaths();
+    configuration.GetSection("AuthorizationExcludePaths").Bind(excludePaths);
+    return excludePaths;
+});
+
 // 添加全局授权策略
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
+        .RequireAssertion(context =>
+        {
+            // 检查请求路径是否为授权排除路径
+            var httpContext = context.Resource as HttpContext;
+            if (httpContext != null)
+            {
+                var excludePaths = httpContext.RequestServices.GetRequiredService<AuthorizationExcludePaths>();
+                return excludePaths.ShouldSkipAuthorization(httpContext.Request.Path) ||
+                       context.User.Identity?.IsAuthenticated == true;
+            }
+            return true;
+        })
         .Build();
 });
 
@@ -36,10 +56,13 @@ builder.Services.AddFluentValidationAutoValidation()
 
 var app = builder.Build();
 
+// 配置基础中间件
 app.ConfigureMiddleware();
 
+// 启用 Swagger 中间件
 app.UseSwaggerMiddleware();
 
+// 映射控制器
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())

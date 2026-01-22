@@ -1,9 +1,11 @@
 namespace CasualAdmin.API.Middleware;
 using System.Security.Claims;
 using System.Text.Json;
+using CasualAdmin.API.Configurations;
 using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Shared.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
@@ -12,14 +14,17 @@ using Microsoft.Extensions.DependencyInjection;
 public class PermissionCheckMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly AuthorizationExcludePaths _authorizationExcludePaths;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="next">下一个中间件</param>
-    public PermissionCheckMiddleware(RequestDelegate next)
+    /// <param name="authorizationExcludePaths">授权排除路径配置</param>
+    public PermissionCheckMiddleware(RequestDelegate next, AuthorizationExcludePaths authorizationExcludePaths)
     {
         _next = next;
+        _authorizationExcludePaths = authorizationExcludePaths;
     }
 
     /// <summary>
@@ -29,11 +34,23 @@ public class PermissionCheckMiddleware
     /// <returns>任务</returns>
     public async Task InvokeAsync(HttpContext context)
     {
-        // 跳过认证接口
-        if (context.Request.Path.StartsWithSegments("/auth"))
+        // 跳过授权排除路径
+        if (_authorizationExcludePaths.ShouldSkipAuthorization(context.Request.Path))
         {
             await _next(context);
             return;
+        }
+
+        // 检查是否有AllowAnonymous属性
+        var endpoint = context.GetEndpoint();
+        if (endpoint != null)
+        {
+            var allowAnonymous = endpoint.Metadata.GetMetadata<IAllowAnonymous>();
+            if (allowAnonymous != null)
+            {
+                await _next(context);
+                return;
+            }
         }
 
         // 检查用户是否已认证

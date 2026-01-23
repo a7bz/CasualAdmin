@@ -1,5 +1,8 @@
 namespace CasualAdmin.Infrastructure.Data.Repositories;
+using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Reflection;
 using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Domain.Entities;
 using SqlSugar;
@@ -12,6 +15,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
 {
     private readonly IDbContext _context;
     private ISugarQueryable<TEntity> _dbSet;
+
+    // 反射缓存
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _primaryKeyCache = new ConcurrentDictionary<Type, PropertyInfo?>();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _createdAtCache = new ConcurrentDictionary<Type, PropertyInfo?>();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _updatedAtCache = new ConcurrentDictionary<Type, PropertyInfo?>();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _isDeletedCache = new ConcurrentDictionary<Type, PropertyInfo?>();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _tenantIdCache = new ConcurrentDictionary<Type, PropertyInfo?>();
+    private static readonly ConcurrentDictionary<Type, Domain.Attributes.EntityConfigAttribute> _entityConfigCache = new ConcurrentDictionary<Type, Domain.Attributes.EntityConfigAttribute>();
 
     /// <summary>
     /// 构造函数
@@ -31,12 +42,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     private ISugarQueryable<TEntity> ApplyFilters(dynamic query)
     {
         var sugarQuery = (ISugarQueryable<TEntity>)query;
-        // 获取实体配置
-        var entityConfig = typeof(TEntity).GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
-            .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute();
+        // 获取实体配置（使用缓存）
+        var entityConfig = _entityConfigCache.GetOrAdd(typeof(TEntity), type =>
+            type.GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
+                .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute()
+        );
 
         // 应用软删除过滤
-        if (entityConfig.EnableSoftDelete && typeof(TEntity).GetProperty("IsDeleted") != null)
+        if (entityConfig.EnableSoftDelete && _isDeletedCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("IsDeleted")) != null)
         {
             sugarQuery = sugarQuery.Where("is_deleted = @isDeleted", new { isDeleted = false });
         }
@@ -78,50 +91,54 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     /// <returns>主键属性信息，可能为null</returns>
     private System.Reflection.PropertyInfo? GetPrimaryKeyProperty()
     {
-        // 尝试查找带有SugarColumn.IsPrimaryKey特性的属性（优先级最高，因为是SqlSugar专用）
-        var sugarKeyProperty = typeof(TEntity).GetProperties()
-            .FirstOrDefault(p =>
-            {
-                var sugarColumnAttrs = p.GetCustomAttributes(typeof(SqlSugar.SugarColumn), true);
-                foreach (var attr in sugarColumnAttrs)
+        // 使用缓存获取主键属性
+        return _primaryKeyCache.GetOrAdd(typeof(TEntity), type =>
+        {
+            // 尝试查找带有SugarColumn.IsPrimaryKey特性的属性（优先级最高，因为是SqlSugar专用）
+            var sugarKeyProperty = type.GetProperties()
+                .FirstOrDefault(p =>
                 {
-                    if (attr is SqlSugar.SugarColumn sugarColumn && sugarColumn.IsPrimaryKey)
+                    var sugarColumnAttrs = p.GetCustomAttributes(typeof(SqlSugar.SugarColumn), true);
+                    foreach (var attr in sugarColumnAttrs)
                     {
-                        return true;
+                        if (attr is SqlSugar.SugarColumn sugarColumn && sugarColumn.IsPrimaryKey)
+                        {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            });
-        if (sugarKeyProperty != null)
-        {
-            return sugarKeyProperty;
-        }
+                    return false;
+                });
+            if (sugarKeyProperty != null)
+            {
+                return sugarKeyProperty;
+            }
 
-        // 尝试查找带有Key特性的属性
-        var keyProperty = typeof(TEntity).GetProperties()
-            .FirstOrDefault(p => p.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), true).Length != 0);
-        if (keyProperty != null)
-        {
-            return keyProperty;
-        }
+            // 尝试查找带有Key特性的属性
+            var keyProperty = type.GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), true).Length != 0);
+            if (keyProperty != null)
+            {
+                return keyProperty;
+            }
 
-        // 尝试查找Id属性（最常见的主键名称）
-        var idProperty = typeof(TEntity).GetProperty("Id");
-        if (idProperty != null)
-        {
-            return idProperty;
-        }
+            // 尝试查找Id属性（最常见的主键名称）
+            var idProperty = type.GetProperty("Id");
+            if (idProperty != null)
+            {
+                return idProperty;
+            }
 
-        // 尝试查找以Id结尾的属性（比如DictItemId）
-        var idEndingProperty = typeof(TEntity).GetProperties()
-            .FirstOrDefault(p => p.Name.EndsWith("Id") && p.PropertyType == typeof(Guid));
-        if (idEndingProperty != null)
-        {
-            return idEndingProperty;
-        }
+            // 尝试查找以Id结尾的属性（比如DictItemId）
+            var idEndingProperty = type.GetProperties()
+                .FirstOrDefault(p => p.Name.EndsWith("Id") && p.PropertyType == typeof(Guid));
+            if (idEndingProperty != null)
+            {
+                return idEndingProperty;
+            }
 
-        // 如果都找不到，返回null
-        return null;
+            // 如果都找不到，返回null
+            return null;
+        });
     }
 
     /// <summary>
@@ -195,21 +212,23 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     /// <returns>添加的实体</returns>
     public async Task<TEntity> AddAsync(TEntity entity)
     {
-        // 设置创建时间和更新时间
+        // 设置创建时间和更新时间（使用缓存）
         var now = DateTime.Now;
-        var createdAtProperty = entity.GetType().GetProperty("CreatedAt");
+        var createdAtProperty = _createdAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("CreatedAt"));
         createdAtProperty?.SetValue(entity, now);
-        var updatedAtProperty = entity.GetType().GetProperty("UpdatedAt");
+        var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
         updatedAtProperty?.SetValue(entity, now);
 
-        // 获取实体配置
-        var entityConfig = typeof(TEntity).GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
-            .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute();
+        // 获取实体配置（使用缓存）
+        var entityConfig = _entityConfigCache.GetOrAdd(typeof(TEntity), type =>
+            type.GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
+                .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute()
+        );
 
-        // 设置租户ID
+        // 设置租户ID（使用缓存）
         if (entityConfig.EnableMultiTenancy && typeof(BaseEntity).IsAssignableFrom(typeof(TEntity)) && _context.CurrentTenantId.HasValue)
         {
-            var tenantIdProperty = entity.GetType().GetProperty("TenantId");
+            var tenantIdProperty = _tenantIdCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("TenantId"));
             tenantIdProperty?.SetValue(entity, _context.CurrentTenantId.Value);
         }
 
@@ -224,8 +243,8 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     /// <returns>更新的实体</returns>
     public async Task<TEntity> UpdateAsync(TEntity entity)
     {
-        // 设置更新时间
-        var updatedAtProperty = entity.GetType().GetProperty("UpdatedAt");
+        // 设置更新时间（使用缓存）
+        var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
         updatedAtProperty?.SetValue(entity, DateTime.Now);
 
         await _context.UpdateAsync(entity);
@@ -240,10 +259,11 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     public async Task<int> UpdateRangeAsync(List<TEntity> entities)
     {
         var now = DateTime.Now;
+        var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
+
         foreach (var entity in entities)
         {
-            // 设置更新时间
-            var updatedAtProperty = entity.GetType().GetProperty("UpdatedAt");
+            // 设置更新时间（使用缓存）
             updatedAtProperty?.SetValue(entity, now);
         }
 
@@ -264,7 +284,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
             return false;
         }
 
-        var isDeletedProperty = typeof(TEntity).GetProperty("IsDeleted");
+        var isDeletedProperty = _isDeletedCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("IsDeleted"));
         if (isDeletedProperty != null)
         {
             // 软删除
@@ -287,21 +307,25 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     public async Task<int> AddRangeAsync(List<TEntity> entities)
     {
         var now = DateTime.Now;
-        // 获取实体配置
-        var entityConfig = typeof(TEntity).GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
-            .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute();
+        // 获取实体配置（使用缓存）
+        var entityConfig = _entityConfigCache.GetOrAdd(typeof(TEntity), type =>
+            type.GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
+                .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute()
+        );
+
+        // 获取属性信息（使用缓存）
+        var createdAtProperty = _createdAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("CreatedAt"));
+        var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
+        var tenantIdProperty = _tenantIdCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("TenantId"));
 
         foreach (var entity in entities)
         {
-            var createdAtProperty = entity.GetType().GetProperty("CreatedAt");
             createdAtProperty?.SetValue(entity, now);
-            var updatedAtProperty = entity.GetType().GetProperty("UpdatedAt");
             updatedAtProperty?.SetValue(entity, now);
 
             // 设置租户ID
             if (entityConfig.EnableMultiTenancy && typeof(BaseEntity).IsAssignableFrom(typeof(TEntity)) && _context.CurrentTenantId.HasValue)
             {
-                var tenantIdProperty = entity.GetType().GetProperty("TenantId");
                 tenantIdProperty?.SetValue(entity, _context.CurrentTenantId.Value);
             }
         }
@@ -316,22 +340,47 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     /// <returns>删除的实体数量</returns>
     public async Task<int> DeleteRangeAsync(List<TEntity> entities)
     {
-        foreach (var entity in entities)
+        if (entities == null || entities.Count == 0)
         {
-            var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
-            if (isDeletedProperty != null)
-            {
-                // 软删除
-                isDeletedProperty.SetValue(entity, true);
-                await UpdateAsync(entity);
-            }
-            else
-            {
-                // 硬删除
-                await _context.DeleteAsync(entity);
-            }
+            return 0;
         }
 
-        return entities.Count;
+        // 获取实体配置（使用缓存）
+        var entityConfig = _entityConfigCache.GetOrAdd(typeof(TEntity), type =>
+            type.GetCustomAttributes(typeof(Domain.Attributes.EntityConfigAttribute), true)
+                .FirstOrDefault() as Domain.Attributes.EntityConfigAttribute ?? new Domain.Attributes.EntityConfigAttribute()
+        );
+
+        // 获取 IsDeleted 属性（使用缓存）
+        var isDeletedProperty = _isDeletedCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("IsDeleted"));
+
+        if (isDeletedProperty != null && entityConfig.EnableSoftDelete)
+        {
+            // 批量软删除：使用 UpdateRangeAsync
+            var now = DateTime.Now;
+            var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
+
+            foreach (var entity in entities)
+            {
+                isDeletedProperty.SetValue(entity, true);
+                updatedAtProperty?.SetValue(entity, now);
+            }
+
+            return await _context.UpdateRangeAsync(entities);
+        }
+        else
+        {
+            // 批量硬删除：使用循环删除，因为 IDbContext 没有提供批量删除方法
+            int deletedCount = 0;
+            foreach (var entity in entities)
+            {
+                var result = await _context.DeleteAsync(entity);
+                if (result > 0)
+                {
+                    deletedCount++;
+                }
+            }
+            return deletedCount;
+        }
     }
 }

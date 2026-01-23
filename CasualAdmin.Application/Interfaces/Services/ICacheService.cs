@@ -14,7 +14,7 @@ namespace CasualAdmin.Application.Interfaces.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        T Get<T>(string key);
+        T? Get<T>(string key);
 
         /// <summary>
         /// 异步获取缓存值
@@ -22,7 +22,7 @@ namespace CasualAdmin.Application.Interfaces.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        Task<T> GetAsync<T>(string key);
+        Task<T?> GetAsync<T>(string key);
 
         /// <summary>
         /// 设置缓存值

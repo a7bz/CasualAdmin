@@ -27,9 +27,13 @@ namespace CasualAdmin.Infrastructure.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        public T Get<T>(string key)
+        public T? Get<T>(string key)
         {
-            return _memoryCache.TryGetValue(key, out T value) ? value : default;
+            if (_memoryCache.TryGetValue(key, out var value))
+            {
+                return (T?)value;
+            }
+            return default;
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        public Task<T> GetAsync<T>(string key)
+        public Task<T?> GetAsync<T>(string key)
         {
             return Task.FromResult(Get<T>(key));
         }

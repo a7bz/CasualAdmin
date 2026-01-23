@@ -103,7 +103,7 @@ public abstract class BaseService<TEntity> : IBaseService<TEntity> where TEntity
     /// </summary>
     /// <param name="entity">实体对象</param>
     /// <returns>创建的实体对象，创建失败则返回null</returns>
-    public async Task<TEntity?> CreateAsync(TEntity entity)
+    public virtual async Task<TEntity?> CreateAsync(TEntity entity)
     {
         // 业务验证
         if (!ValidateEntity(entity))
@@ -128,7 +128,7 @@ public abstract class BaseService<TEntity> : IBaseService<TEntity> where TEntity
     /// </summary>
     /// <param name="entity">实体对象</param>
     /// <returns>更新的实体对象</returns>
-    public async Task<TEntity?> UpdateAsync(TEntity entity)
+    public virtual async Task<TEntity?> UpdateAsync(TEntity entity)
     {
         // 业务验证
         if (!ValidateEntity(entity))
@@ -156,7 +156,7 @@ public abstract class BaseService<TEntity> : IBaseService<TEntity> where TEntity
     /// </summary>
     /// <param name="id">实体ID</param>
     /// <returns>删除结果</returns>
-    public async Task<bool> DeleteAsync(Guid id)
+    public virtual async Task<bool> DeleteAsync(Guid id)
     {
         // 删除前业务逻辑处理
         OnBeforeDelete(id);

@@ -35,7 +35,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        public T Get<T>(string key)
+        public T? Get<T>(string key)
         {
             var value = _redisDatabase.StringGet(key);
             if (value.IsNull)
@@ -43,7 +43,8 @@ namespace CasualAdmin.Infrastructure.Services
                 return default;
             }
 
-            return JsonSerializer.Deserialize<T>(value);
+            var valueString = value.ToString();
+            return JsonSerializer.Deserialize<T>(valueString);
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <typeparam name="T">缓存值类型</typeparam>
         /// <param name="key">缓存键</param>
         /// <returns>缓存值，不存在则返回默认值</returns>
-        public async Task<T> GetAsync<T>(string key)
+        public async Task<T?> GetAsync<T>(string key)
         {
             var value = await _redisDatabase.StringGetAsync(key);
             if (value.IsNull)
@@ -60,7 +61,8 @@ namespace CasualAdmin.Infrastructure.Services
                 return default;
             }
 
-            return JsonSerializer.Deserialize<T>(value);
+            var valueString = value.ToString();
+            return JsonSerializer.Deserialize<T>(valueString);
         }
 
         /// <summary>

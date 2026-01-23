@@ -1,6 +1,7 @@
 namespace CasualAdmin.API.Middleware;
 using System.Diagnostics;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 
 /// <summary>
 /// 日志中间件
@@ -10,6 +11,7 @@ public class LoggingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<LoggingMiddleware> _logger;
     private readonly LoggingOptions _options;
+    private readonly IHostEnvironment _environment;
 
     /// <summary>
     /// 构造函数
@@ -21,6 +23,22 @@ public class LoggingMiddleware
     {
         _next = next;
         _logger = logger;
+        _options = options ?? new LoggingOptions();
+        _environment = null!; // 默认为 null，在运行时通过 DI 解析
+    }
+
+    /// <summary>
+    /// 构造函数（用于 DI 注入）
+    /// </summary>
+    /// <param name="next">下一个中间件</param>
+    /// <param name="logger">日志记录器</param>
+    /// <param name="environment">环境信息</param>
+    /// <param name="options">日志配置选项</param>
+    public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger, IHostEnvironment environment, LoggingOptions? options = null)
+    {
+        _next = next;
+        _logger = logger;
+        _environment = environment;
         _options = options ?? new LoggingOptions();
     }
 
@@ -42,8 +60,8 @@ public class LoggingMiddleware
         var startTime = Stopwatch.GetTimestamp();
         _logger.LogInformation("Request started: {Method} {Path}", context.Request.Method, context.Request.Path);
 
-        // 记录请求体
-        if (_options.IncludeRequestBody)
+        // 记录请求体（仅在开发环境或明确配置时）
+        if (_options.IncludeRequestBody && (_environment?.IsDevelopment() ?? false))
         {
             var requestBody = await ReadRequestBodyAsync(context.Request);
             if (!string.IsNullOrEmpty(requestBody))
@@ -52,13 +70,19 @@ public class LoggingMiddleware
             }
         }
 
-        // 创建响应体流包装器，用于捕获响应内容
-        var originalResponseBodyStream = context.Response.Body;
-        using var responseBodyStream = new MemoryStream();
-        context.Response.Body = responseBodyStream;
+        // 只在需要记录响应体时创建内存流
+        Stream originalResponseBodyStream = context.Response.Body;
+        MemoryStream? responseBodyStream = null;
 
         try
         {
+            if (_options.IncludeResponseBody && (_environment?.IsDevelopment() ?? false))
+            {
+                // 只在需要时创建内存流
+                responseBodyStream = new MemoryStream();
+                context.Response.Body = responseBodyStream;
+            }
+
             // 执行下一个中间件
             await _next(context);
         }
@@ -74,8 +98,8 @@ public class LoggingMiddleware
             _logger.LogInformation("Request completed: {Method} {Path} {StatusCode} in {ElapsedTime}",
                 context.Request.Method, context.Request.Path, context.Response.StatusCode, elapsedTime);
 
-            // 记录响应体
-            if (_options.IncludeResponseBody)
+            // 记录响应体（仅在开发环境或明确配置时）
+            if (_options.IncludeResponseBody && (_environment?.IsDevelopment() ?? false) && responseBodyStream != null)
             {
                 context.Response.Body.Seek(0, SeekOrigin.Begin);
                 var responseBody = await ReadResponseBodyAsync(context.Response);
@@ -85,16 +109,11 @@ public class LoggingMiddleware
                 {
                     _logger.LogInformation("Response body: {ResponseBody}", responseBody);
                 }
-            }
-            else
-            {
-                // 如果不记录响应体，也需要将流位置重置到开始
-                context.Response.Body.Seek(0, SeekOrigin.Begin);
-            }
 
-            // 复制响应到原始流
-            await responseBodyStream.CopyToAsync(originalResponseBodyStream);
-            context.Response.Body = originalResponseBodyStream;
+                // 复制响应到原始流
+                await responseBodyStream.CopyToAsync(originalResponseBodyStream);
+                context.Response.Body = originalResponseBodyStream;
+            }
         }
     }
 

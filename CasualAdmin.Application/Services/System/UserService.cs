@@ -107,4 +107,20 @@ public class UserService : BaseService<SysUser>, IUserService
         var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
         return result == PasswordVerificationResult.Success;
     }
+
+    /// <summary>
+    /// 异步验证密码
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <param name="password">密码</param>
+    /// <returns>验证结果</returns>
+    public async Task<bool> VerifyPasswordAsync(SysUser user, string password)
+    {
+        // 使用 Task.Run 包装同步操作，避免阻塞主线程
+        return await Task.Run(() =>
+        {
+            var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
+            return result == PasswordVerificationResult.Success;
+        });
+    }
 }

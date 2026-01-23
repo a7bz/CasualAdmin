@@ -23,6 +23,14 @@ public interface IUserService : IBaseService<SysUser>
     /// <returns>验证结果</returns>
     bool VerifyPassword(SysUser user, string password);
 
+    /// <summary>
+    /// 异步验证密码
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <param name="password">密码</param>
+    /// <returns>验证结果</returns>
+    Task<bool> VerifyPasswordAsync(SysUser user, string password);
+
     // 以下方法是为了兼容现有API控制器而添加的
     /// <summary>
     /// 根据ID获取用户

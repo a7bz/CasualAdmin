@@ -216,6 +216,6 @@ public class AuthServiceTests
 
         // Assert
         var exception = Assert.Throws<ArgumentException>(() => JwtTokenHelper.GetUserIdFromToken(invalidToken));
-        Assert.Contains("Token does not contain user ID", exception.Message);
+        Assert.Contains("token中不包含用户ID", exception.Message);
     }
 }

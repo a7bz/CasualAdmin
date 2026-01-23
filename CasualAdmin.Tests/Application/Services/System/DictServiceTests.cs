@@ -16,6 +16,7 @@ public class DictServiceTests
     private readonly Mock<IRepository<SysDictItem>> _dictItemRepositoryMock;
     private readonly Mock<IValidationService> _validationServiceMock;
     private readonly Mock<IEventBus> _eventBusMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly DictService _dictService;
 
     /// <summary>
@@ -28,12 +29,13 @@ public class DictServiceTests
         _dictItemRepositoryMock = new Mock<IRepository<SysDictItem>>();
         _validationServiceMock = new Mock<IValidationService>();
         _eventBusMock = new Mock<IEventBus>();
+        _cacheServiceMock = new Mock<ICacheService>();
 
         // 配置模拟验证服务
         _validationServiceMock.Setup(v => v.ValidateAndThrow(It.IsAny<SysDict>())).Verifiable();
 
         // 创建被测服务实例
-        _dictService = new DictService(_dictRepositoryMock.Object, _validationServiceMock.Object, _eventBusMock.Object, _dictItemRepositoryMock.Object);
+        _dictService = new DictService(_dictRepositoryMock.Object, _validationServiceMock.Object, _eventBusMock.Object, _dictItemRepositoryMock.Object, _cacheServiceMock.Object);
     }
 
     /// <summary>

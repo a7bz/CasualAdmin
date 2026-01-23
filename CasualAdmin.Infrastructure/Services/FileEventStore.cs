@@ -25,7 +25,7 @@ public class FileEventStore : IEventStore
         _jsonOptions = new JsonSerializerOptions
         {
             WriteIndented = true,
-            IgnoreNullValues = false
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
         };
 
         // 确保存储目录存在

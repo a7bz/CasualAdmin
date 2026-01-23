@@ -1,11 +1,11 @@
 namespace CasualAdmin.Application.Services;
+using CasualAdmin.Application.Interfaces.Events;
+using CasualAdmin.Domain.Events;
 using global::System;
 using global::System.Collections.Concurrent;
 using global::System.Reflection;
 using global::System.Threading;
 using global::System.Threading.Tasks;
-using CasualAdmin.Application.Interfaces.Events;
-using CasualAdmin.Domain.Events;
 
 /// <summary>
 /// 事件总线实现，用于发布和处理领域事件

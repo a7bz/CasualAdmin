@@ -4,8 +4,8 @@ using System.Text.Json;
 using CasualAdmin.API.Configurations;
 using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Shared.Common;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>

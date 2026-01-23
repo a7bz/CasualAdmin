@@ -1,11 +1,12 @@
 namespace CasualAdmin.API.Configurations;
 
+using System.IO;
 using CasualAdmin.API.Middleware;
 using CasualAdmin.Infrastructure.FileStorage;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 
 public static class MiddlewareConfiguration
 {
@@ -51,6 +52,9 @@ public static class MiddlewareConfiguration
         // 添加异常处理中间件
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+        // 启用 API 速率限制中间件
+        app.UseRateLimiting();
+
         // 从配置文件中读取日志中间件选项
         var loggingOptions = new LoggingOptions();
         app.ApplicationServices.GetRequiredService<IConfiguration>().GetSection("LoggingMiddleware").Bind(loggingOptions);
@@ -60,7 +64,7 @@ public static class MiddlewareConfiguration
 
         // 添加认证中间件
         app.UseAuthentication();
-        
+
         // 添加授权中间件
         app.UseAuthorization();
 

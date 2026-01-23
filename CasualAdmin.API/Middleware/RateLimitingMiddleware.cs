@@ -16,6 +16,19 @@ public class RateLimitingMiddleware
     private readonly ConcurrentDictionary<string, RateLimitCounter> _rateLimitCounters;
 
     /// <summary>
+    /// 构造函数（用于中间件激活）
+    /// </summary>
+    /// <param name="next">下一个中间件</param>
+    /// <param name="logger">日志记录器</param>
+    public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+        _options = new RateLimitingOptions();
+        _rateLimitCounters = new ConcurrentDictionary<string, RateLimitCounter>();
+    }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="next">下一个中间件</param>
@@ -219,6 +232,10 @@ public static class RateLimitingMiddlewareExtensions
     /// <returns>应用构建器</returns>
     public static IApplicationBuilder UseRateLimiting(this IApplicationBuilder app, RateLimitingOptions? options = null)
     {
-        return app.UseMiddleware<RateLimitingMiddleware>(options);
+        if (options != null)
+        {
+            return app.UseMiddleware<RateLimitingMiddleware>(options);
+        }
+        return app.UseMiddleware<RateLimitingMiddleware>();
     }
 }

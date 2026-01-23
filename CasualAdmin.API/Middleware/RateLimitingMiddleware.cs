@@ -79,7 +79,7 @@ public class RateLimitingMiddleware
         {
             // 返回 429 Too Many Requests
             context.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
-            context.Response.Headers["Retry-After"] = _options.WindowSeconds.ToString();
+            context.Response.Headers["RetryAfter"] = _options.WindowSeconds.ToString();
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync("{\"error\": \"Too many requests\", \"message\": \"Rate limit exceeded. Please try again later.\"}");
             _logger.LogWarning("Rate limit exceeded for {RequestKey}", requestKey);
@@ -190,17 +190,12 @@ public class RateLimitingOptions
     /// <summary>
     /// 排除的路径
     /// </summary>
-    public List<string> ExcludePaths { get; set; } = new List<string>
-    {
-        "/swagger",
-        "/health",
-        "/files"
-    };
+    public List<string> ExcludePaths { get; set; } = ["/swagger", "/health", "/files"];
 
     /// <summary>
     /// 排除的HTTP方法
     /// </summary>
-    public List<string> ExcludeMethods { get; set; } = new List<string>();
+    public List<string> ExcludeMethods { get; set; } = [];
 }
 
 /// <summary>

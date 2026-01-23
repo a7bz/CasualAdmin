@@ -28,10 +28,10 @@ public class LoggingOptions
     /// <summary>
     /// 排除记录日志的路径
     /// </summary>
-    public List<string> ExcludePaths { get; set; } = new List<string>();
+    public List<string> ExcludePaths { get; set; } = [];
 
     /// <summary>
     /// 排除记录日志的HTTP方法
     /// </summary>
-    public List<string> ExcludeMethods { get; set; } = new List<string>();
+    public List<string> ExcludeMethods { get; set; } = [];
 }

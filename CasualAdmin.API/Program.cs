@@ -12,6 +12,9 @@ builder.ConfigureSerilog();
 
 builder.Services.ConfigureDatabase();
 
+// 添加内存缓存服务
+builder.Services.AddMemoryCache();
+
 builder.Services.RegisterServices(builder.Configuration);
 
 builder.Services.ConfigureAutoMapper();

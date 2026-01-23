@@ -6,7 +6,9 @@ using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Application.Services;
 using CasualAdmin.Infrastructure.Data;
 using CasualAdmin.Infrastructure.Data.Repositories;
+using CasualAdmin.Infrastructure.Factories;
 using CasualAdmin.Infrastructure.FileStorage;
+using CasualAdmin.Infrastructure.Services;
 
 public static class ServiceRegistration
 {
@@ -18,8 +20,13 @@ public static class ServiceRegistration
         // 注册工作单元
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // 注册事件总线
-        services.AddScoped<IEventBus, EventBus>();
+        // 注册事件总线 - 使用工厂模式创建，因为需要两个构造参数
+        services.AddScoped<IEventBus>(sp =>
+        {
+            var serviceProvider = sp.GetRequiredService<IServiceProvider>();
+            var eventStore = sp.GetRequiredService<IEventStore>();
+            return new EventBus(serviceProvider, eventStore);
+        });
 
         // 自动注册所有实现了特定接口的服务
         // 获取Application程序集
@@ -34,6 +41,12 @@ public static class ServiceRegistration
 
         // 注册文件存储服务
         RegisterFileStorageService(services, configuration);
+
+        // 注册缓存服务
+        services.AddCacheService(configuration);
+
+        // 注册事件存储服务
+        services.AddScoped<IEventStore, FileEventStore>();
     }
 
     private static void RegisterFileStorageService(IServiceCollection services, IConfiguration configuration)

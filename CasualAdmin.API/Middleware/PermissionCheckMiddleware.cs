@@ -94,13 +94,9 @@ public class PermissionCheckMiddleware
                 return;
             }
 
-            // 获取所有角色的权限
-            var permissions = new List<Domain.Entities.System.SysPermission>();
-            foreach (var role in roles)
-            {
-                var rolePermissions = await permissionService.GetPermissionsByRoleIdAsync(role.RoleId);
-                permissions.AddRange(rolePermissions);
-            }
+            // 获取所有角色的权限（批量查询，避免N+1问题）
+            var roleIds = roles.Select(r => r.RoleId).ToList();
+            var permissions = await permissionService.GetPermissionsByRoleIdsAsync(roleIds);
 
             // 提取权限代码
             var permissionCodes = permissions.Select(p => p.PermissionCode).Distinct().ToList();
@@ -112,9 +108,12 @@ public class PermissionCheckMiddleware
         }
         catch (Exception ex)
         {
+            var logger = context.RequestServices.GetRequiredService<ILogger<PermissionCheckMiddleware>>();
+            logger.LogError(ex, "权限检查失败，请求路径: {Path}", context.Request.Path);
+
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/json";
-            var response = ApiResponse<object>.Failed("权限检查失败: " + ex.Message, 500);
+            var response = ApiResponse<object>.Failed("权限检查失败，请联系管理员", 500);
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }

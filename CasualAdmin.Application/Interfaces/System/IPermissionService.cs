@@ -16,6 +16,13 @@ public interface IPermissionService : IBaseService<SysPermission>
     Task<List<SysPermission>> GetPermissionsByRoleIdAsync(Guid roleId);
 
     /// <summary>
+    /// 批量根据角色ID获取权限列表
+    /// </summary>
+    /// <param name="roleIds">角色ID列表</param>
+    /// <returns>权限列表</returns>
+    Task<List<SysPermission>> GetPermissionsByRoleIdsAsync(List<Guid> roleIds);
+
+    /// <summary>
     /// 根据菜单ID获取权限列表
     /// </summary>
     /// <param name="menuId">菜单ID</param>

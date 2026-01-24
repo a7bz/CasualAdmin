@@ -106,7 +106,7 @@ public class UserServiceTests
         user.SetUsername("testuser");
         user.SetEmail(email);
 
-        _userRepositoryMock.Setup(r => r.FindAsync(u => u.Email == email)).ReturnsAsync([user]);
+        _userRepositoryMock.Setup(r => r.FirstOrDefaultAsync(u => u.Email == email)).ReturnsAsync(user);
 
         // Act
         var result = await _userService.GetUserByEmailAsync(email);
@@ -116,7 +116,7 @@ public class UserServiceTests
         Assert.Equal(user.UserId, result.UserId);
         Assert.Equal(user.Username, result.Username);
         Assert.Equal(user.Email, result.Email);
-        _userRepositoryMock.Verify(r => r.FindAsync(u => u.Email == email), Times.Once);
+        _userRepositoryMock.Verify(r => r.FirstOrDefaultAsync(u => u.Email == email), Times.Once);
     }
 
     /// <summary>
@@ -128,14 +128,14 @@ public class UserServiceTests
         // Arrange
         var email = "nonexistent@example.com";
 
-        _userRepositoryMock.Setup(r => r.FindAsync(u => u.Email == email)).ReturnsAsync([]);
+        _userRepositoryMock.Setup(r => r.FirstOrDefaultAsync(u => u.Email == email)).ReturnsAsync((SysUser?)null);
 
         // Act
         var result = await _userService.GetUserByEmailAsync(email);
 
         // Assert
         Assert.Null(result);
-        _userRepositoryMock.Verify(r => r.FindAsync(u => u.Email == email), Times.Once);
+        _userRepositoryMock.Verify(r => r.FirstOrDefaultAsync(u => u.Email == email), Times.Once);
     }
 
     /// <summary>

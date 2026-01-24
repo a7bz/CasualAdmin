@@ -52,8 +52,7 @@ public class UserService : BaseService<SysUser>, IUserService
     /// <returns>用户实体</returns>
     public async Task<SysUser?> GetUserByEmailAsync(string email)
     {
-        var users = await _repository.FindAsync(u => u.Email == email);
-        return users.FirstOrDefault();
+        return await _repository.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     /// <summary>
@@ -114,13 +113,10 @@ public class UserService : BaseService<SysUser>, IUserService
     /// <param name="user">用户实体</param>
     /// <param name="password">密码</param>
     /// <returns>验证结果</returns>
-    public async Task<bool> VerifyPasswordAsync(SysUser user, string password)
+    public Task<bool> VerifyPasswordAsync(SysUser user, string password)
     {
-        // 使用 Task.Run 包装同步操作，避免阻塞主线程
-        return await Task.Run(() =>
-        {
-            var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
-            return result == PasswordVerificationResult.Success;
-        });
+        // 密码验证是CPU密集型但耗时很短的操作，不需要使用Task.Run
+        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        return Task.FromResult(result == PasswordVerificationResult.Success);
     }
 }

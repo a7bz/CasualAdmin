@@ -60,8 +60,15 @@ public class SqlSugarContext : SqlSugarClient, IDbContext
         })
     {
         _configuration = configuration;
-        _enableCodeFirst = _configuration.GetValue("SqlSugar:EnableCodeFirst", false);
-        _dropExistingTables = _configuration.GetValue("SqlSugar:DropExistingTables", false);
+
+        // 获取当前环境
+        var environment = _configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT") ?? "Production";
+
+        // 生产环境强制禁用CodeFirst和删除现有表功能
+        _enableCodeFirst = environment.Equals("Development", StringComparison.OrdinalIgnoreCase) && _configuration.GetValue("SqlSugar:EnableCodeFirst", false);
+
+        _dropExistingTables = environment.Equals("Development", StringComparison.OrdinalIgnoreCase) && _configuration.GetValue("SqlSugar:DropExistingTables", false);
+
         _isMultiTenancyEnabled = _configuration.GetValue("MultiTenancy:IsEnabled", false);
         _currentTenantId = _configuration.GetValue<Guid?>("MultiTenancy:DefaultTenantId");
 

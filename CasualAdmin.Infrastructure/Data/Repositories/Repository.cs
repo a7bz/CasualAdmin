@@ -17,12 +17,12 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     private ISugarQueryable<TEntity> _dbSet;
 
     // 反射缓存
-    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _primaryKeyCache = new ConcurrentDictionary<Type, PropertyInfo?>();
-    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _createdAtCache = new ConcurrentDictionary<Type, PropertyInfo?>();
-    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _updatedAtCache = new ConcurrentDictionary<Type, PropertyInfo?>();
-    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _isDeletedCache = new ConcurrentDictionary<Type, PropertyInfo?>();
-    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _tenantIdCache = new ConcurrentDictionary<Type, PropertyInfo?>();
-    private static readonly ConcurrentDictionary<Type, Domain.Attributes.EntityConfigAttribute> _entityConfigCache = new ConcurrentDictionary<Type, Domain.Attributes.EntityConfigAttribute>();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _primaryKeyCache = new();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _createdAtCache = new();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _updatedAtCache = new();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _isDeletedCache = new();
+    private static readonly ConcurrentDictionary<Type, PropertyInfo?> _tenantIdCache = new();
+    private static readonly ConcurrentDictionary<Type, Domain.Attributes.EntityConfigAttribute> _entityConfigCache = new();
 
     /// <summary>
     /// 构造函数
@@ -51,14 +51,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
         // 应用软删除过滤
         if (entityConfig.EnableSoftDelete && _isDeletedCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("IsDeleted")) != null)
         {
-            sugarQuery = sugarQuery.Where("is_deleted = @isDeleted", new { isDeleted = false });
+            sugarQuery = sugarQuery.Where("IsDeleted = @0", false);
         }
 
         // 应用多租户过滤
         if (entityConfig.EnableMultiTenancy && typeof(BaseEntity).IsAssignableFrom(typeof(TEntity)) && _context.CurrentTenantId.HasValue)
         {
             var tenantId = _context.CurrentTenantId.Value;
-            sugarQuery = sugarQuery.Where("tenant_id = @tenantId", new { tenantId });
+            sugarQuery = sugarQuery.Where("TenantId = @0", tenantId);
         }
 
         return sugarQuery;
@@ -89,7 +89,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
     /// 获取实体的主键属性
     /// </summary>
     /// <returns>主键属性信息，可能为null</returns>
-    private System.Reflection.PropertyInfo? GetPrimaryKeyProperty()
+    private PropertyInfo? GetPrimaryKeyProperty()
     {
         // 使用缓存获取主键属性
         return _primaryKeyCache.GetOrAdd(typeof(TEntity), type =>
@@ -98,10 +98,10 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
             var sugarKeyProperty = type.GetProperties()
                 .FirstOrDefault(p =>
                 {
-                    var sugarColumnAttrs = p.GetCustomAttributes(typeof(SqlSugar.SugarColumn), true);
+                    var sugarColumnAttrs = p.GetCustomAttributes(typeof(SugarColumn), true);
                     foreach (var attr in sugarColumnAttrs)
                     {
-                        if (attr is SqlSugar.SugarColumn sugarColumn && sugarColumn.IsPrimaryKey)
+                        if (attr is SugarColumn sugarColumn && sugarColumn.IsPrimaryKey)
                         {
                             return true;
                         }

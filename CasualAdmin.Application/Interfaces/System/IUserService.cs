@@ -16,6 +16,13 @@ public interface IUserService : IBaseService<SysUser>
     Task<SysUser?> GetUserByEmailAsync(string email);
 
     /// <summary>
+    /// 根据用户名获取用户
+    /// </summary>
+    /// <param name="username">用户名</param>
+    /// <returns>用户实体，可能为null</returns>
+    Task<SysUser?> GetUserByUsernameAsync(string username);
+
+    /// <summary>
     /// 验证密码
     /// </summary>
     /// <param name="user">用户实体</param>

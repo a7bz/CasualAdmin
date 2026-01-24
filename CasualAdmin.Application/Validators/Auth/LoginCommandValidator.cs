@@ -13,11 +13,10 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     /// </summary>
     public LoginCommandValidator()
     {
-        // 邮箱验证
-        RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("邮箱不能为空")
-            .EmailAddress().WithMessage("请输入有效的邮箱地址")
-            .Length(1, 100).WithMessage("邮箱长度不能超过100个字符");
+        // 账号验证（支持用户名或邮箱）
+        RuleFor(x => x.Account)
+            .NotEmpty().WithMessage("账号不能为空")
+            .Length(1, 100).WithMessage("账号长度不能超过100个字符");
 
         // 密码验证
         RuleFor(x => x.Password)

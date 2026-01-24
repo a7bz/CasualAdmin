@@ -6,9 +6,9 @@ namespace CasualAdmin.Application.Commands.Auth;
 public class LoginCommand
 {
     /// <summary>
-    /// 邮箱
+    /// 账号（用户名或邮箱）
     /// </summary>
-    public string Email { get; set; } = string.Empty;
+    public string Account { get; set; } = string.Empty;
 
     /// <summary>
     /// 密码

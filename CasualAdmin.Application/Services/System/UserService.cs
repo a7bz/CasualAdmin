@@ -56,6 +56,16 @@ public class UserService : BaseService<SysUser>, IUserService
     }
 
     /// <summary>
+    /// 根据用户名获取用户
+    /// </summary>
+    /// <param name="username">用户名</param>
+    /// <returns>用户实体</returns>
+    public async Task<SysUser?> GetUserByUsernameAsync(string username)
+    {
+        return await _repository.FirstOrDefaultAsync(u => u.Username == username);
+    }
+
+    /// <summary>
     /// 创建用户
     /// </summary>
     /// <param name="user">用户实体</param>

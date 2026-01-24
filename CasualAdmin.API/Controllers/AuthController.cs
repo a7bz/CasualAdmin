@@ -126,11 +126,17 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ApiResponse<object>> Login([FromBody] LoginCommand command)
     {
-        // 查找用户
-        var user = await _userService.GetUserByEmailAsync(command.Email);
+        // 查找用户（支持用户名或邮箱）
+        var user = await _userService.GetUserByUsernameAsync(command.Account);
         if (user == null)
         {
-            return ApiResponse<object>.BadRequest("邮箱或密码错误");
+            // 如果用户名不存在，尝试通过邮箱查找
+            user = await _userService.GetUserByEmailAsync(command.Account);
+        }
+
+        if (user == null)
+        {
+            return ApiResponse<object>.BadRequest("账号或密码错误");
         }
 
         // 解密密码

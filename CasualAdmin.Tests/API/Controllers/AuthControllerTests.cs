@@ -127,12 +127,12 @@ public class AuthControllerTests
         // Arrange
         var loginCommand = new LoginCommand
         {
-            Email = "test@example.com",
+            Account = "test@example.com",
             Password = "encrypted_password"
         };
 
         var existingUser = new SysUser();
-        _userServiceMock.Setup(service => service.GetUserByEmailAsync(loginCommand.Email)).ReturnsAsync(existingUser);
+        _userServiceMock.Setup(service => service.GetUserByUsernameAsync(loginCommand.Account)).ReturnsAsync(existingUser);
         _userServiceMock.Setup(service => service.VerifyPassword(existingUser, It.IsAny<string>())).Returns(true);
         _authServiceMock.Setup(service => service.GenerateJwtToken(existingUser)).ReturnsAsync("test_token");
 
@@ -154,11 +154,12 @@ public class AuthControllerTests
         // Arrange
         var loginCommand = new LoginCommand
         {
-            Email = "non_existent@example.com",
+            Account = "non_existent@example.com",
             Password = "encrypted_password"
         };
 
-        _userServiceMock.Setup(service => service.GetUserByEmailAsync(loginCommand.Email)).ReturnsAsync((SysUser?)null);
+        _userServiceMock.Setup(service => service.GetUserByUsernameAsync(loginCommand.Account)).ReturnsAsync((SysUser?)null);
+        _userServiceMock.Setup(service => service.GetUserByEmailAsync(loginCommand.Account)).ReturnsAsync((SysUser?)null);
 
         // Act
         var result = await _authController.Login(loginCommand);
@@ -177,12 +178,12 @@ public class AuthControllerTests
         // Arrange
         var loginCommand = new LoginCommand
         {
-            Email = "test@example.com",
+            Account = "test@example.com",
             Password = "wrong_encrypted_password"
         };
 
         var existingUser = new SysUser();
-        _userServiceMock.Setup(service => service.GetUserByEmailAsync(loginCommand.Email)).ReturnsAsync(existingUser);
+        _userServiceMock.Setup(service => service.GetUserByUsernameAsync(loginCommand.Account)).ReturnsAsync(existingUser);
         _userServiceMock.Setup(service => service.VerifyPassword(existingUser, It.IsAny<string>())).Returns(false);
 
         // Act

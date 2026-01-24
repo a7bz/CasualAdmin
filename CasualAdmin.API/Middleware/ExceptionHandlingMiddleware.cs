@@ -52,24 +52,33 @@ public class ExceptionHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-        var response = exception switch
+        // 获取环境变量
+        var environment = context.RequestServices.GetRequiredService<IWebHostEnvironment>();
+
+        // 根据异常类型设置状态码和错误信息
+        var (statusCode, message) = exception switch
         {
             // 认证授权相关异常
-            SecurityTokenExpiredException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token已过期"),
-            SecurityTokenInvalidSignatureException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token签名无效"),
-            SecurityTokenInvalidIssuerException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token颁发者无效"),
-            SecurityTokenInvalidAudienceException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "Token受众无效"),
-            AuthenticationException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "认证失败"),
-            UnauthorizedAccessException => new ApiResponse<object>(StatusCodes.Status401Unauthorized, "未授权访问"),
+            SecurityTokenExpiredException => (StatusCodes.Status401Unauthorized, "Token已过期"),
+            SecurityTokenInvalidSignatureException => (StatusCodes.Status401Unauthorized, "Token签名无效"),
+            SecurityTokenInvalidIssuerException => (StatusCodes.Status401Unauthorized, "Token颁发者无效"),
+            SecurityTokenInvalidAudienceException => (StatusCodes.Status401Unauthorized, "Token受众无效"),
+            AuthenticationException => (StatusCodes.Status401Unauthorized, "认证失败"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "未授权访问"),
 
             // 其他常见异常
-            ArgumentNullException => new ApiResponse<object>(StatusCodes.Status400BadRequest, "请求参数不能为空"),
-            ArgumentException => new ApiResponse<object>(StatusCodes.Status400BadRequest, "请求参数无效"),
-            KeyNotFoundException => new ApiResponse<object>(StatusCodes.Status404NotFound, "请求的资源不存在"),
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "请求参数不能为空"),
+            ArgumentException => (StatusCodes.Status400BadRequest, "请求参数无效"),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "请求的资源不存在"),
 
             // 默认异常
-            _ => new ApiResponse<object>(StatusCodes.Status500InternalServerError, "服务器内部错误，请稍后重试")
+            _ => (StatusCodes.Status500InternalServerError, environment.IsDevelopment()
+                ? $"服务器内部错误: {exception.Message}"
+                : "服务器内部错误，请稍后重试")
         };
+
+        context.Response.StatusCode = statusCode;
+        var response = new ApiResponse<object>(statusCode, message);
 
         await context.Response.WriteAsJsonAsync(response);
     }

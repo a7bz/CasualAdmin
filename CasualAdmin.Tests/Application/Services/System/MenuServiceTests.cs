@@ -13,6 +13,7 @@ using Xunit;
 public class MenuServiceTests
 {
     private readonly Mock<IRepository<SysMenu>> _menuRepositoryMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly Mock<IValidationService> _validationServiceMock;
     private readonly Mock<IEventBus> _eventBusMock;
     private readonly MenuService _menuService;
@@ -24,6 +25,7 @@ public class MenuServiceTests
     {
         // 初始化模拟对象
         _menuRepositoryMock = new Mock<IRepository<SysMenu>>();
+        _cacheServiceMock = new Mock<ICacheService>();
         _validationServiceMock = new Mock<IValidationService>();
         _eventBusMock = new Mock<IEventBus>();
 
@@ -31,7 +33,7 @@ public class MenuServiceTests
         _validationServiceMock.Setup(v => v.ValidateAndThrow(It.IsAny<SysMenu>())).Verifiable();
 
         // 创建被测服务实例
-        _menuService = new MenuService(_menuRepositoryMock.Object, _validationServiceMock.Object, _eventBusMock.Object);
+        _menuService = new MenuService(_menuRepositoryMock.Object, _cacheServiceMock.Object, _validationServiceMock.Object, _eventBusMock.Object);
     }
 
     /// <summary>

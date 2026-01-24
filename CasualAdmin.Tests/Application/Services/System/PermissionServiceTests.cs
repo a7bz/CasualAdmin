@@ -13,6 +13,8 @@ using Xunit;
 public class PermissionServiceTests
 {
     private readonly Mock<IRepository<SysPermission>> _permissionRepositoryMock;
+    private readonly Mock<IRepository<SysRolePermission>> _rolePermissionRepositoryMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly Mock<IValidationService> _validationServiceMock;
     private readonly Mock<IEventBus> _eventBusMock;
     private readonly PermissionService _permissionService;
@@ -24,6 +26,8 @@ public class PermissionServiceTests
     {
         // 初始化模拟对象
         _permissionRepositoryMock = new Mock<IRepository<SysPermission>>();
+        _rolePermissionRepositoryMock = new Mock<IRepository<SysRolePermission>>();
+        _cacheServiceMock = new Mock<ICacheService>();
         _validationServiceMock = new Mock<IValidationService>();
         _eventBusMock = new Mock<IEventBus>();
 
@@ -31,7 +35,7 @@ public class PermissionServiceTests
         _validationServiceMock.Setup(v => v.ValidateAndThrow(It.IsAny<SysPermission>())).Verifiable();
 
         // 创建被测服务实例
-        _permissionService = new PermissionService(_permissionRepositoryMock.Object, _validationServiceMock.Object, _eventBusMock.Object);
+        _permissionService = new PermissionService(_permissionRepositoryMock.Object, _rolePermissionRepositoryMock.Object, _cacheServiceMock.Object, _validationServiceMock.Object, _eventBusMock.Object);
     }
 
     /// <summary>

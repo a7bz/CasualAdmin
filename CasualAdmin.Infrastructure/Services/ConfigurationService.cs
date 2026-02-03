@@ -48,13 +48,13 @@ public class ConfigurationService : IConfigurationService
     /// <param name="key">配置键</param>
     /// <param name="defaultValue">默认值</param>
     /// <returns>配置值</returns>
-    public T GetValue<T>(string key, T defaultValue = default)
+    public T GetValue<T>(string key, T defaultValue = default!)
     {
         if (_configurationRoot == null)
         {
             return defaultValue;
         }
 
-        return _configurationRoot.GetValue<T>(key, defaultValue);
+        return _configurationRoot.GetValue(key, defaultValue);
     }
 }

@@ -42,7 +42,7 @@ public class ValidationService : IValidationService
                 var entityType = validatorType.BaseType?.GetGenericArguments().FirstOrDefault();
                 if (entityType != null)
                 {
-                    if (Activator.CreateInstance(validatorType) is IValidator validator)
+                    if (_serviceProvider.GetService(validatorType) is IValidator validator)
                     {
                         _validators[entityType] = validator;
                     }

@@ -33,7 +33,7 @@ public class RsaEncryptionServiceTests
         // Assert
         Assert.NotNull(publicKey);
         Assert.NotEmpty(publicKey);
-        Assert.Contains("BEGIN RSA PUBLIC KEY", publicKey);
+        Assert.Contains("PUBLIC KEY", publicKey);
     }
 
     /// <summary>

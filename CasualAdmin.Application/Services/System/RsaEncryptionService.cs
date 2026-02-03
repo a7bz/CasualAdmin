@@ -1,4 +1,5 @@
 namespace CasualAdmin.Application.Services.System;
+
 using CasualAdmin.Application.Interfaces.System;
 using global::System.Security.Cryptography;
 using global::System.Text;
@@ -13,17 +14,17 @@ public class RsaEncryptionService : IRsaEncryptionService
     private readonly string _privateKey;
 
     /// <summary>
-        /// 构造函数
-        /// </summary>
-        public RsaEncryptionService()
-        {
-            _rsa = RSA.Create();
-            _rsa.KeySize = 2048;
+    /// 构造函数
+    /// </summary>
+    public RsaEncryptionService()
+    {
+        _rsa = RSA.Create();
+        _rsa.KeySize = 2048;
 
-            // 生成公钥和私钥
-            _publicKey = _rsa.ToXmlString(false); // 只包含公钥的XML格式
-            _privateKey = _rsa.ToXmlString(true); // 包含私钥
-        }
+        // 生成公钥和私钥
+        _publicKey = _rsa.ToXmlString(false); // 只包含公钥的XML格式
+        _privateKey = _rsa.ToXmlString(true); // 包含私钥
+    }
 
     /// <summary>
     /// 获取RSA公钥
@@ -31,7 +32,52 @@ public class RsaEncryptionService : IRsaEncryptionService
     /// <returns>RSA公钥</returns>
     public string GetPublicKey()
     {
-        return ExportRsaPublicKeyToPem(_rsa);
+        return ExportPublicKeySpki();
+    }
+
+    /// <summary>
+    /// 导出SPKI格式公钥
+    /// </summary>
+    private string ExportPublicKeySpki()
+    {
+        // ExportSubjectPublicKeyInfo 返回 SPKI 格式
+        byte[] publicKeyBytes = _rsa.ExportSubjectPublicKeyInfo();
+        string base64Key = Convert.ToBase64String(publicKeyBytes);
+
+        // 格式化为 PEM
+        return FormatPem(base64Key, "PUBLIC KEY");
+    }
+
+    /// <summary>
+    /// 导出传统RSA公钥格式
+    /// </summary>
+    private string ExportRsaPublicKey()
+    {
+        // ExportRSAPublicKey 返回 PKCS#1 格式
+        byte[] publicKeyBytes = _rsa.ExportRSAPublicKey();
+        string base64Key = Convert.ToBase64String(publicKeyBytes);
+
+        // 格式化为 PEM
+        return FormatPem(base64Key, "RSA PUBLIC KEY");
+    }
+
+    /// <summary>
+    /// 格式化PEM密钥
+    /// </summary>
+    private string FormatPem(string base64Key, string keyType)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine($"-----BEGIN {keyType}-----");
+
+        // 每64个字符换行
+        for (int i = 0; i < base64Key.Length; i += 64)
+        {
+            int length = Math.Min(64, base64Key.Length - i);
+            sb.AppendLine(base64Key.Substring(i, length));
+        }
+
+        sb.AppendLine($"-----END {keyType}-----");
+        return sb.ToString();
     }
 
     /// <summary>
@@ -43,31 +89,25 @@ public class RsaEncryptionService : IRsaEncryptionService
     {
         try
         {
-            // 将Base64编码的加密数据转换为字节数组
             byte[] encryptedBytes = Convert.FromBase64String(encryptedData);
+            byte[] decryptedBytes;
 
-            // 解密数据
-            byte[] decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
+            // OAEP-SHA256 填充（Web Crypto API 使用）
+            decryptedBytes = _rsa.Decrypt(encryptedBytes, RSAEncryptionPadding.OaepSHA256);
 
-            // 将解密后的字节数组转换为字符串
             return Encoding.UTF8.GetString(decryptedBytes);
         }
-        catch (Exception)
+        catch (FormatException)
         {
-            throw new InvalidOperationException("密码解密失败");
+            throw new InvalidOperationException("加密数据不是有效的Base64格式");
         }
-    }
-
-    /// <summary>
-    /// 导出RSA公钥到PEM格式
-    /// </summary>
-    /// <param name="rsa">RSA实例</param>
-    /// <returns>PEM格式的RSA公钥</returns>
-    private static string ExportRsaPublicKeyToPem(RSA rsa)
-    {
-        byte[] publicKeyBytes = rsa.ExportRSAPublicKey();
-        return $"-----BEGIN RSA PUBLIC KEY-----\n" +
-               $"{Convert.ToBase64String(publicKeyBytes, Base64FormattingOptions.InsertLineBreaks)}\n" +
-               $"-----END RSA PUBLIC KEY-----";
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException($"密码解密失败: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"解密过程中发生错误: {ex.Message}");
+        }
     }
 }

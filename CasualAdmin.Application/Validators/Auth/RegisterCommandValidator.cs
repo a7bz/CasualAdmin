@@ -24,12 +24,24 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
             .EmailAddress().WithMessage("请输入有效的邮箱地址")
             .MaximumLength(100).WithMessage("邮箱长度不能超过100个字符");
 
-        // 密码验证
+        // 密码验证（加密后的密码）
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("密码不能为空")
-            .MinimumLength(6).WithMessage("密码长度不能少于6个字符")
-            .MaximumLength(20).WithMessage("密码长度不能超过20个字符")
-            .Matches(@"[A-Za-z]").WithMessage("密码必须包含至少一个字母")
-            .Matches(@"[0-9]").WithMessage("密码必须包含至少一个数字");
+            .Must(BeValidBase64).WithMessage("密码格式不正确")
+            .Length(1, 500).WithMessage("密码长度超过限制");
+
+        // 验证是否为有效的Base64字符串
+        bool BeValidBase64(string password)
+        {
+            try
+            {
+                Convert.FromBase64String(password);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

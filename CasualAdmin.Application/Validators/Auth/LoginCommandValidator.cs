@@ -18,9 +18,24 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
             .NotEmpty().WithMessage("账号不能为空")
             .Length(1, 100).WithMessage("账号长度不能超过100个字符");
 
-        // 密码验证
+        // 密码验证（加密后的密码）
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("密码不能为空")
-            .Length(1, 255).WithMessage("密码长度不能超过255个字符");
+            .Must(BeValidBase64).WithMessage("密码格式不正确")
+            .Length(1, 500).WithMessage("密码长度超过限制");
+
+        // 验证是否为有效的Base64字符串
+        bool BeValidBase64(string password)
+        {
+            try
+            {
+                Convert.FromBase64String(password);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

@@ -1,11 +1,11 @@
 namespace CasualAdmin.Infrastructure.Services
 {
     using System;
-    using System.Text;
     using System.Text.Json;
     using System.Threading.Tasks;
     using CasualAdmin.Application.Interfaces.Services;
-    using Microsoft.Extensions.Configuration;
+    using CasualAdmin.Infrastructure.Cache;
+    using Microsoft.Extensions.Options;
     using StackExchange.Redis;
 
     /// <summary>
@@ -15,19 +15,26 @@ namespace CasualAdmin.Infrastructure.Services
     {
         private readonly IDatabase _redisDatabase;
         private readonly ConnectionMultiplexer _redisConnection;
+        private readonly string _keyPrefix;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="configuration">配置对象</param>
-        public RedisCacheService(IConfiguration configuration)
+        /// <param name="options">缓存配置选项</param>
+        public RedisCacheService(IOptions<CacheOptions> options)
         {
-            var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString")
-                ?? throw new ArgumentNullException("Redis:ConnectionString", "Redis连接字符串未配置");
+            var redisOptions = options.Value.Redis;
+            _keyPrefix = redisOptions.KeyPrefix;
 
-            _redisConnection = ConnectionMultiplexer.Connect(redisConnectionString);
-            _redisDatabase = _redisConnection.GetDatabase();
+            var connectionString = redisOptions.BuildConnectionString();
+            _redisConnection = ConnectionMultiplexer.Connect(connectionString);
+            _redisDatabase = _redisConnection.GetDatabase(redisOptions.Database);
         }
+
+        /// <summary>
+        /// 获取带前缀的键
+        /// </summary>
+        private string GetPrefixedKey(string key) => $"{_keyPrefix}{key}";
 
         /// <summary>
         /// 获取缓存值
@@ -37,7 +44,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <returns>缓存值，不存在则返回默认值</returns>
         public T? Get<T>(string key)
         {
-            var value = _redisDatabase.StringGet(key);
+            var value = _redisDatabase.StringGet(GetPrefixedKey(key));
             if (value.IsNull)
             {
                 return default;
@@ -55,7 +62,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <returns>缓存值，不存在则返回默认值</returns>
         public async Task<T?> GetAsync<T>(string key)
         {
-            var value = await _redisDatabase.StringGetAsync(key);
+            var value = await _redisDatabase.StringGetAsync(GetPrefixedKey(key));
             if (value.IsNull)
             {
                 return default;
@@ -75,7 +82,7 @@ namespace CasualAdmin.Infrastructure.Services
         public void Set<T>(string key, T value, TimeSpan expiration)
         {
             var jsonValue = JsonSerializer.Serialize(value);
-            _redisDatabase.StringSet(key, jsonValue, expiration);
+            _redisDatabase.StringSet(GetPrefixedKey(key), jsonValue, expiration);
         }
 
         /// <summary>
@@ -89,7 +96,7 @@ namespace CasualAdmin.Infrastructure.Services
         public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
             var jsonValue = JsonSerializer.Serialize(value);
-            await _redisDatabase.StringSetAsync(key, jsonValue, expiration);
+            await _redisDatabase.StringSetAsync(GetPrefixedKey(key), jsonValue, expiration);
         }
 
         /// <summary>
@@ -98,7 +105,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <param name="key">缓存键</param>
         public void Remove(string key)
         {
-            _redisDatabase.KeyDelete(key);
+            _redisDatabase.KeyDelete(GetPrefixedKey(key));
         }
 
         /// <summary>
@@ -108,7 +115,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <returns>任务</returns>
         public async Task RemoveAsync(string key)
         {
-            await _redisDatabase.KeyDeleteAsync(key);
+            await _redisDatabase.KeyDeleteAsync(GetPrefixedKey(key));
         }
 
         /// <summary>
@@ -118,7 +125,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <returns>是否存在</returns>
         public bool Exists(string key)
         {
-            return _redisDatabase.KeyExists(key);
+            return _redisDatabase.KeyExists(GetPrefixedKey(key));
         }
 
         /// <summary>
@@ -128,7 +135,7 @@ namespace CasualAdmin.Infrastructure.Services
         /// <returns>是否存在</returns>
         public async Task<bool> ExistsAsync(string key)
         {
-            return await _redisDatabase.KeyExistsAsync(key);
+            return await _redisDatabase.KeyExistsAsync(GetPrefixedKey(key));
         }
     }
 }

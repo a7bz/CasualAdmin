@@ -51,14 +51,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
         // 应用软删除过滤
         if (entityConfig.EnableSoftDelete && _isDeletedCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("IsDeleted")) != null)
         {
-            sugarQuery = sugarQuery.Where("IsDeleted = @0", false);
+            sugarQuery = sugarQuery.Where("is_deleted = @IsDeleted", new { IsDeleted = false });
         }
 
         // 应用多租户过滤
         if (entityConfig.EnableMultiTenancy && typeof(BaseEntity).IsAssignableFrom(typeof(TEntity)) && _context.CurrentTenantId.HasValue)
         {
             var tenantId = _context.CurrentTenantId.Value;
-            sugarQuery = sugarQuery.Where("TenantId = @0", tenantId);
+            sugarQuery = sugarQuery.Where("tenant_id = @TenantId", new { TenantId = tenantId });
         }
 
         return sugarQuery;

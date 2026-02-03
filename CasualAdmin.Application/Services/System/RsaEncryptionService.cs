@@ -21,7 +21,7 @@ public class RsaEncryptionService : IRsaEncryptionService
         _rsa.KeySize = 2048;
 
         // 生成公钥和私钥
-        _publicKey = _rsa.ToXmlString(false); // 仅公钥
+        _publicKey = ExportRsaPublicKeyToPem(_rsa); // 正确导出公钥
         _privateKey = _rsa.ToXmlString(true); // 包含私钥
     }
 
@@ -56,5 +56,18 @@ public class RsaEncryptionService : IRsaEncryptionService
         {
             throw new InvalidOperationException("密码解密失败");
         }
+    }
+
+    /// <summary>
+    /// 导出RSA公钥到PEM格式
+    /// </summary>
+    /// <param name="rsa">RSA实例</param>
+    /// <returns>PEM格式的RSA公钥</returns>
+    private static string ExportRsaPublicKeyToPem(RSA rsa)
+    {
+        byte[] publicKeyBytes = rsa.ExportRSAPublicKey();
+        return $"-----BEGIN RSA PUBLIC KEY-----\n" +
+               $"{Convert.ToBase64String(publicKeyBytes, Base64FormattingOptions.InsertLineBreaks)}\n" +
+               $"-----END RSA PUBLIC KEY-----";
     }
 }

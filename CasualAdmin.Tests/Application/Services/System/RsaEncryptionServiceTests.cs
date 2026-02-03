@@ -1,4 +1,5 @@
 namespace CasualAdmin.Tests.Application.Services.System;
+
 using System;
 using CasualAdmin.Application.Services.System;
 using Xunit;
@@ -32,7 +33,7 @@ public class RsaEncryptionServiceTests
         // Assert
         Assert.NotNull(publicKey);
         Assert.NotEmpty(publicKey);
-        Assert.Contains("<RSAKeyValue>", publicKey);
+        Assert.Contains("BEGIN RSA PUBLIC KEY", publicKey);
     }
 
     /// <summary>

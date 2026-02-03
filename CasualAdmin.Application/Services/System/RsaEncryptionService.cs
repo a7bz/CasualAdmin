@@ -13,17 +13,17 @@ public class RsaEncryptionService : IRsaEncryptionService
     private readonly string _privateKey;
 
     /// <summary>
-    /// 构造函数
-    /// </summary>
-    public RsaEncryptionService()
-    {
-        _rsa = RSA.Create();
-        _rsa.KeySize = 2048;
+        /// 构造函数
+        /// </summary>
+        public RsaEncryptionService()
+        {
+            _rsa = RSA.Create();
+            _rsa.KeySize = 2048;
 
-        // 生成公钥和私钥
-        _publicKey = ExportRsaPublicKeyToPem(_rsa); // 正确导出公钥
-        _privateKey = _rsa.ToXmlString(true); // 包含私钥
-    }
+            // 生成公钥和私钥
+            _publicKey = _rsa.ToXmlString(false); // 只包含公钥的XML格式
+            _privateKey = _rsa.ToXmlString(true); // 包含私钥
+        }
 
     /// <summary>
     /// 获取RSA公钥
@@ -31,7 +31,7 @@ public class RsaEncryptionService : IRsaEncryptionService
     /// <returns>RSA公钥</returns>
     public string GetPublicKey()
     {
-        return _publicKey;
+        return ExportRsaPublicKeyToPem(_rsa);
     }
 
     /// <summary>

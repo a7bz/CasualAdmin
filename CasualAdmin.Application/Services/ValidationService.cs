@@ -1,7 +1,6 @@
 namespace CasualAdmin.Application.Services;
 using CasualAdmin.Application.Interfaces.Services;
 using FluentValidation;
-using global::System.Reflection;
 
 /// <summary>
 /// 验证服务实现，使用FluentValidation进行实体验证
@@ -18,7 +17,7 @@ public class ValidationService : IValidationService
     public ValidationService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _validators = new Dictionary<Type, IValidator>();
+        _validators = [];
 
         // 扫描并注册所有验证器
         RegisterValidators();
@@ -43,8 +42,7 @@ public class ValidationService : IValidationService
                 var entityType = validatorType.BaseType?.GetGenericArguments().FirstOrDefault();
                 if (entityType != null)
                 {
-                    var validator = Activator.CreateInstance(validatorType) as IValidator;
-                    if (validator != null)
+                    if (Activator.CreateInstance(validatorType) is IValidator validator)
                     {
                         _validators[entityType] = validator;
                     }
@@ -59,7 +57,7 @@ public class ValidationService : IValidationService
     /// <typeparam name="T">实体类型</typeparam>
     /// <param name="entity">实体对象</param>
     /// <returns>验证结果，包含验证是否成功和错误信息</returns>
-    public (bool IsValid, IEnumerable<string> Errors) Validate<T>(T entity) where T : class, new()
+    public (bool IsValid, IEnumerable<string> Errors) Validate<T>(T? entity) where T : class, new()
     {
         if (entity == null)
         {

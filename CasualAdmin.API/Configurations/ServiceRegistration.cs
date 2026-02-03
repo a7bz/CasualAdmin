@@ -83,19 +83,36 @@ public static class ServiceRegistration
             var interfaces = implementationType.GetInterfaces()
                 .Where(i => i.Name.EndsWith("Service"));
 
+            // 判断是否为RsaEncryptionService，如果是则注册为Singleton
+            bool isRsaEncryptionService = implementationType.Name == "RsaEncryptionService";
+
             if (interfaces.Any())
             {
                 // 如果有实现接口，则按接口注册
                 foreach (var interfaceType in interfaces)
                 {
-                    // 注册为Scoped服务
-                    services.AddScoped(interfaceType, implementationType);
+                    // 注册服务，RsaEncryptionService使用Singleton生命周期，其他使用Scoped
+                    if (isRsaEncryptionService)
+                    {
+                        services.AddSingleton(interfaceType, implementationType);
+                    }
+                    else
+                    {
+                        services.AddScoped(interfaceType, implementationType);
+                    }
                 }
             }
             else
             {
                 // 如果没有实现接口，则按具体类注册
-                services.AddScoped(implementationType);
+                if (isRsaEncryptionService)
+                {
+                    services.AddSingleton(implementationType);
+                }
+                else
+                {
+                    services.AddScoped(implementationType);
+                }
             }
         }
     }

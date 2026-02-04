@@ -99,15 +99,14 @@ public class AuthController : ControllerBase
         // 将角色列表转换为DTO，只返回必要的信息
         var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);
 
-        // 获取所有角色的权限，并提取权限key列表
+        // 批量获取所有角色的权限，避免N+1查询问题
         var permissionKeys = new List<string>();
-        foreach (var role in roles)
+        if (roles.Count > 0)
         {
-            var permissions = await _permissionService.GetPermissionsByRoleIdAsync(role.RoleId);
-            permissionKeys.AddRange(permissions.Select(p => p.PermissionCode));
+            var roleIds = roles.Select(r => r.RoleId).ToList();
+            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+            permissionKeys = permissions.Select(p => p.PermissionCode).Distinct().ToList();
         }
-        // 去重
-        permissionKeys = [.. permissionKeys.Distinct()];
 
         return ApiResponse<object>.Success(new
         {
@@ -159,15 +158,14 @@ public class AuthController : ControllerBase
         // 将角色列表转换为DTO，只返回必要的信息
         var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);
 
-        // 获取所有角色的权限，并提取权限key列表
+        // 批量获取所有角色的权限，避免N+1查询问题
         var permissionKeys = new List<string>();
-        foreach (var role in roles)
+        if (roles.Count > 0)
         {
-            var permissions = await _permissionService.GetPermissionsByRoleIdAsync(role.RoleId);
-            permissionKeys.AddRange(permissions.Select(p => p.PermissionCode));
+            var roleIds = roles.Select(r => r.RoleId).ToList();
+            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+            permissionKeys = permissions.Select(p => p.PermissionCode).Distinct().ToList();
         }
-        // 去重
-        permissionKeys = [.. permissionKeys.Distinct()];
 
         return ApiResponse<object>.Success(new
         {

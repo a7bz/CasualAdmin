@@ -56,6 +56,37 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// 获取用户详细信息（Token、用户DTO、角色、权限）
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <returns>用户详细信息元组</returns>
+    private async Task<(string token, SysUserDto userDto, List<SysRoleDto> roleDtos, List<string> permissionKeys)> GetUserDetailsAsync(SysUser user)
+    {
+        // 生成Token
+        var token = await _authService.GenerateJwtToken(user);
+
+        // 将用户实体转换为DTO，避免返回嵌套的部门信息
+        var userDto = _mapper.Map<SysUserDto>(user);
+
+        // 获取用户角色列表
+        var roles = await _roleService.GetRolesByUserIdAsync(user.UserId);
+
+        // 将角色列表转换为DTO，只返回必要的信息
+        var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);
+
+        // 批量获取所有角色的权限，避免N+1查询问题
+        var permissionKeys = new List<string>();
+        if (roles.Count > 0)
+        {
+            var roleIds = roles.Select(r => r.RoleId).ToList();
+            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+            permissionKeys = permissions.Select(p => p.PermissionCode).Distinct().ToList();
+        }
+
+        return (token, userDto, roleDtos, permissionKeys);
+    }
+
+    /// <summary>
     /// 获取RSA公钥
     /// </summary>
     /// <returns>RSA公钥</returns>
@@ -107,25 +138,8 @@ public class AuthController : ControllerBase
             return ApiResponse<object>.Failed("注册失败");
         }
 
-        // 生成Token
-        var token = await _authService.GenerateJwtToken(createdUser);
-        // 将用户实体转换为DTO，避免返回嵌套的部门信息
-        var userDto = _mapper.Map<SysUserDto>(createdUser);
-
-        // 获取用户角色列表
-        var roles = await _roleService.GetRolesByUserIdAsync(createdUser.UserId);
-
-        // 将角色列表转换为DTO，只返回必要的信息
-        var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);
-
-        // 批量获取所有角色的权限，避免N+1查询问题
-        var permissionKeys = new List<string>();
-        if (roles.Count > 0)
-        {
-            var roleIds = roles.Select(r => r.RoleId).ToList();
-            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
-            permissionKeys = permissions.Select(p => p.PermissionCode).Distinct().ToList();
-        }
+        // 获取用户详细信息
+        var (token, userDto, roleDtos, permissionKeys) = await GetUserDetailsAsync(createdUser);
 
         return ApiResponse<object>.Success(new
         {
@@ -166,25 +180,8 @@ public class AuthController : ControllerBase
             return ApiResponse<object>.BadRequest("邮箱或密码错误");
         }
 
-        // 生成Token
-        var token = await _authService.GenerateJwtToken(user);
-        // 将用户实体转换为DTO，避免返回嵌套的部门信息
-        var userDto = _mapper.Map<SysUserDto>(user);
-
-        // 获取用户角色列表
-        var roles = await _roleService.GetRolesByUserIdAsync(user.UserId);
-
-        // 将角色列表转换为DTO，只返回必要的信息
-        var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);
-
-        // 批量获取所有角色的权限，避免N+1查询问题
-        var permissionKeys = new List<string>();
-        if (roles.Count > 0)
-        {
-            var roleIds = roles.Select(r => r.RoleId).ToList();
-            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
-            permissionKeys = permissions.Select(p => p.PermissionCode).Distinct().ToList();
-        }
+        // 获取用户详细信息
+        var (token, userDto, roleDtos, permissionKeys) = await GetUserDetailsAsync(user);
 
         return ApiResponse<object>.Success(new
         {

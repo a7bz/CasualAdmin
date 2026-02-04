@@ -5,9 +5,9 @@ using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Models.DTOs.Responses.System;
 using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Shared.Common;
+using global::System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using global::System.Text.RegularExpressions;
 
 /// <summary>
 /// 认证控制器

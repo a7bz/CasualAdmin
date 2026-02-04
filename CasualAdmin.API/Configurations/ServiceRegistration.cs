@@ -30,16 +30,9 @@ public static class ServiceRegistration
             return new EventBus(serviceProvider, eventStore);
         });
 
-        // 自动注册所有实现了特定接口的服务
-        // 获取Application程序集
-        var applicationAssembly = Assembly.Load("CasualAdmin.Application");
-        var infrastructureAssembly = Assembly.Load("CasualAdmin.Infrastructure");
-
-        // 扫描所有服务实现类 - Application层
-        RegisterServicesFromAssembly(services, applicationAssembly);
-
-        // 扫描所有服务实现类 - Infrastructure层
-        RegisterServicesFromAssembly(services, infrastructureAssembly);
+        // 自动注册所有实现了特定接口的服务 - 使用 Scrutor 简化
+        RegisterServicesFromAssembly(services, Assembly.Load("CasualAdmin.Application"));
+        RegisterServicesFromAssembly(services, Assembly.Load("CasualAdmin.Infrastructure"));
 
         // 注册文件存储服务
         RegisterFileStorageService(services, configuration);
@@ -75,49 +68,24 @@ public static class ServiceRegistration
 
     private static void RegisterServicesFromAssembly(IServiceCollection services, Assembly assembly)
     {
-        // 只注册名称以Service结尾的类，避免注册编译器生成的类型
-        // 排除缓存服务，由专门的AddCacheService方法注册
-        var serviceImplementations = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service") && !t.Name.Contains("CacheService"));
-
-
-        foreach (var implementationType in serviceImplementations)
-        {
-            // 获取实现的所有接口
-            var interfaces = implementationType.GetInterfaces()
-                .Where(i => i.Name.EndsWith("Service"));
-
-            // 判断是否为RsaEncryptionService，如果是则注册为Singleton
-            bool isRsaEncryptionService = implementationType.Name == "RsaEncryptionService";
-
-            if (interfaces.Any())
-            {
-                // 如果有实现接口，则按接口注册
-                foreach (var interfaceType in interfaces)
-                {
-                    // 注册服务，RsaEncryptionService使用Singleton生命周期，其他使用Scoped
-                    if (isRsaEncryptionService)
-                    {
-                        services.AddSingleton(interfaceType, implementationType);
-                    }
-                    else
-                    {
-                        services.AddScoped(interfaceType, implementationType);
-                    }
-                }
-            }
-            else
-            {
-                // 如果没有实现接口，则按具体类注册
-                if (isRsaEncryptionService)
-                {
-                    services.AddSingleton(implementationType);
-                }
-                else
-                {
-                    services.AddScoped(implementationType);
-                }
-            }
-        }
+        // 使用 Scrutor 简化服务注册逻辑
+        services.Scan(scan => scan
+            .FromAssemblyDependencies(assembly)
+                // 查找所有以 Service 结尾的非抽象类（排除 CacheService 和 RsaEncryptionService）
+                .AddClasses(classes => classes
+                    .Where(type =>
+                        type.Name.EndsWith("Service") &&
+                        !type.Name.Contains("CacheService") &&
+                        type.Name != "RsaEncryptionService"))
+                // 映射到所有实现的接口
+                .AsImplementedInterfaces()
+                // 默认使用 Scoped 生命周期
+                .WithScopedLifetime()
+                // 特殊处理：RsaEncryptionService 使用 Singleton 生命周期
+                .AddClasses(classes => classes
+                    .Where(type => type.Name == "RsaEncryptionService"))
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime()
+        );
     }
 }

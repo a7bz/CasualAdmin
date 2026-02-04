@@ -7,6 +7,7 @@ using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using global::System.Text.RegularExpressions;
 
 /// <summary>
 /// 认证控制器
@@ -43,6 +44,18 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// 验证密码复杂度要求
+    /// </summary>
+    /// <param name="password">密码</param>
+    /// <returns>是否符合复杂度要求</returns>
+    private bool ValidatePasswordComplexity(string password)
+    {
+        // 使用正则表达式验证密码复杂度：至少8位，包含大小写字母、数字和特殊字符
+        var pattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$";
+        return Regex.IsMatch(password, pattern);
+    }
+
+    /// <summary>
     /// 获取RSA公钥
     /// </summary>
     /// <returns>RSA公钥</returns>
@@ -70,6 +83,12 @@ public class AuthController : ControllerBase
 
         // 解密密码
         var decryptedPassword = _rsaEncryptionService.Decrypt(command.Password);
+
+        // 验证密码复杂度
+        if (!ValidatePasswordComplexity(decryptedPassword))
+        {
+            return ApiResponse<object>.BadRequest("密码长度不能少于8位，必须包含大小写字母、数字和特殊字符");
+        }
 
         // 创建新用户
         var user = new SysUser();

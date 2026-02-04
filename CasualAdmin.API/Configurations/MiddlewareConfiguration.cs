@@ -49,6 +49,9 @@ public static class MiddlewareConfiguration
 
         app.UseRouting();
 
+        // 添加日志上下文中间件（必须在异常处理中间件之前）
+        app.UseLogContext();
+
         // 添加异常处理中间件
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 

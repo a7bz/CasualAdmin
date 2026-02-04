@@ -10,6 +10,9 @@ public class ValidationService : IValidationService
     private readonly IServiceProvider _serviceProvider;
     private readonly Dictionary<Type, IValidator> _validators;
 
+    // 静态缓存，避免重复扫描程序集
+    private static readonly Lazy<Dictionary<Type, Type>> _validatorTypeCache = new Lazy<Dictionary<Type, Type>>(ScanValidatorTypes);
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -19,15 +22,17 @@ public class ValidationService : IValidationService
         _serviceProvider = serviceProvider;
         _validators = [];
 
-        // 扫描并注册所有验证器
-        RegisterValidators();
+        // 从缓存中获取验证器类型并解析实例
+        RegisterValidatorsFromCache();
     }
 
     /// <summary>
-    /// 扫描并注册所有验证器
+    /// 扫描所有验证器类型（仅执行一次）
     /// </summary>
-    private void RegisterValidators()
+    private static Dictionary<Type, Type> ScanValidatorTypes()
     {
+        var validatorTypeMap = new Dictionary<Type, Type>();
+
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => a.FullName != null && a.FullName.Contains("CasualAdmin"));
 
@@ -42,11 +47,26 @@ public class ValidationService : IValidationService
                 var entityType = validatorType.BaseType?.GetGenericArguments().FirstOrDefault();
                 if (entityType != null)
                 {
-                    if (_serviceProvider.GetService(validatorType) is IValidator validator)
-                    {
-                        _validators[entityType] = validator;
-                    }
+                    validatorTypeMap[entityType] = validatorType;
                 }
+            }
+        }
+
+        return validatorTypeMap;
+    }
+
+    /// <summary>
+    /// 从缓存中注册验证器实例
+    /// </summary>
+    private void RegisterValidatorsFromCache()
+    {
+        var validatorTypeCache = _validatorTypeCache.Value;
+
+        foreach (var (entityType, validatorType) in validatorTypeCache)
+        {
+            if (_serviceProvider.GetService(validatorType) is IValidator validator)
+            {
+                _validators[entityType] = validator;
             }
         }
     }

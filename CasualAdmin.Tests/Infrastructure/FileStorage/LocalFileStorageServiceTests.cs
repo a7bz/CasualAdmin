@@ -1,7 +1,7 @@
 namespace CasualAdmin.Tests.Infrastructure.FileStorage;
+
 using System.IO;
 using System.Text;
-using CasualAdmin.Domain.Entities;
 using CasualAdmin.Infrastructure.FileStorage;
 using Xunit;
 
@@ -196,7 +196,7 @@ public class LocalFileStorageServiceTests
         }
 
         // Act - 1. 初始化分片上传
-        var uploadRequest = new CasualAdmin.Application.Models.File.UploadPartRequest
+        var uploadRequest = new Domain.Infrastructure.Services.File.UploadPartRequest
         {
             FileName = fileName,
             ContentType = contentType,
@@ -240,7 +240,7 @@ public class LocalFileStorageServiceTests
         var contentType = "text/plain";
 
         // 初始化分片上传
-        var uploadRequest = new CasualAdmin.Application.Models.File.UploadPartRequest
+        var uploadRequest = new Domain.Infrastructure.Services.File.UploadPartRequest
         {
             FileName = fileName,
             ContentType = contentType,
@@ -285,7 +285,7 @@ public class LocalFileStorageServiceTests
         var contentType = "text/plain";
 
         // 初始化分片上传
-        var uploadRequest = new CasualAdmin.Application.Models.File.UploadPartRequest
+        var uploadRequest = new Domain.Infrastructure.Services.File.UploadPartRequest
         {
             FileName = fileName,
             ContentType = contentType,

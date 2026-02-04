@@ -1,10 +1,10 @@
 namespace CasualAdmin.Tests.Application.Services
 {
-    using CasualAdmin.Application.Interfaces.Base;
     using CasualAdmin.Application.Interfaces.Events;
     using CasualAdmin.Application.Interfaces.Services;
     using CasualAdmin.Application.Services;
     using CasualAdmin.Domain.Entities.System;
+    using CasualAdmin.Domain.Infrastructure.Data;
     using Moq;
     using Xunit;
 

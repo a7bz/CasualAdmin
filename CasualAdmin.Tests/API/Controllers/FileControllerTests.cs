@@ -1,10 +1,8 @@
 namespace CasualAdmin.Tests.API.Controllers;
 
 using CasualAdmin.API.Controllers;
-using CasualAdmin.Application.Interfaces.Services;
-using CasualAdmin.Application.Models.File;
+using CasualAdmin.Domain.Infrastructure.Services;
 using global::System.IO;
-using global::System.Text;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -155,7 +153,7 @@ public class FileControllerTests
     public async Task InitMultipartUpload_ShouldReturnSuccessResult()
     {
         // Arrange
-        var uploadPartRequest = new UploadPartRequest
+        var uploadPartRequest = new Domain.Infrastructure.Services.File.UploadPartRequest
         {
             FileName = "test.txt",
             ContentType = "text/plain",
@@ -193,7 +191,7 @@ public class FileControllerTests
         fileMock.Setup(f => f.ContentType).Returns(contentType);
         fileMock.Setup(f => f.Length).Returns(content.Length);
 
-        var uploadPartResponse = new UploadPartResponse
+        var uploadPartResponse = new Domain.Infrastructure.Services.File.UploadPartResponse
         {
             IsCompleted = false,
             UploadedParts = new List<int> { 0 }

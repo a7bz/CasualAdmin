@@ -1,9 +1,9 @@
 namespace CasualAdmin.Domain.Infrastructure.Events;
 
-using CasualAdmin.Domain.Events;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CasualAdmin.Domain.Events;
 
 /// <summary>
 /// 事件存储接口，用于持久化存储领域事件

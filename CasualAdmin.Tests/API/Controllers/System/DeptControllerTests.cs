@@ -6,7 +6,6 @@ using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Models.DTOs.Requests.System;
 using CasualAdmin.Application.Models.DTOs.Responses.System;
 using CasualAdmin.Domain.Entities.System;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 

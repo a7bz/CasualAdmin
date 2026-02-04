@@ -1,6 +1,5 @@
 namespace CasualAdmin.Tests.Application.Services.System;
 
-using System;
 using CasualAdmin.Application.Services.System;
 using Xunit;
 

@@ -55,6 +55,6 @@ public class ConfigurationService : IConfigurationService
             return defaultValue;
         }
 
-        return _configurationRoot.GetValue(key, defaultValue);
+        return _configurationRoot.GetValue<T>(key) ?? defaultValue;
     }
 }

@@ -1,6 +1,7 @@
-namespace CasualAdmin.Application.Interfaces.Base;
-using global::System.Data;
-using global::System.Linq.Expressions;
+namespace CasualAdmin.Domain.Infrastructure.Data;
+
+using System.Data;
+using System.Linq.Expressions;
 
 /// <summary>
 /// 数据库上下文接口，抽象数据库操作

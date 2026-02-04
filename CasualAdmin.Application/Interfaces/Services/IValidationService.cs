@@ -1,5 +1,4 @@
 namespace CasualAdmin.Application.Interfaces.Services;
-using FluentValidation;
 
 /// <summary>
 /// 验证服务接口，用于验证实体数据

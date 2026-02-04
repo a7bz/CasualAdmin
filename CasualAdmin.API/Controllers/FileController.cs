@@ -1,7 +1,7 @@
 namespace CasualAdmin.API.Controllers;
 
-using CasualAdmin.Application.Interfaces.Services;
-using CasualAdmin.Application.Models.File;
+using CasualAdmin.Domain.Infrastructure.Services;
+using CasualAdmin.Domain.Infrastructure.Services.File;
 using CasualAdmin.Shared.Common;
 using Microsoft.AspNetCore.Mvc;
 

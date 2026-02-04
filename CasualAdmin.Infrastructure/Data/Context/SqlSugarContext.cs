@@ -2,7 +2,7 @@ namespace CasualAdmin.Infrastructure.Data.Context;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
-using CasualAdmin.Application.Interfaces.Base;
+using CasualAdmin.Domain.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using SqlSugar;
 

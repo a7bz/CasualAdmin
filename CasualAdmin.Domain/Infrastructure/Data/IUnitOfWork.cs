@@ -1,5 +1,6 @@
-namespace CasualAdmin.Application.Interfaces.Base;
-using global::System.Data;
+namespace CasualAdmin.Domain.Infrastructure.Data;
+
+using System.Data;
 
 /// <summary>
 /// 工作单元接口，用于管理事务和协调多个仓储

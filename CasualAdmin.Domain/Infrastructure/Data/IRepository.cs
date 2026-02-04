@@ -1,5 +1,6 @@
-namespace CasualAdmin.Application.Interfaces.Base;
-using global::System.Linq.Expressions;
+namespace CasualAdmin.Domain.Infrastructure.Data;
+
+using System.Linq.Expressions;
 
 /// <summary>
 /// 泛型仓储接口

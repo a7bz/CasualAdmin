@@ -1,10 +1,11 @@
 namespace CasualAdmin.Application.Services.System;
-using CasualAdmin.Application.Interfaces.Base;
+
 using CasualAdmin.Application.Interfaces.Events;
 using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Services;
 using CasualAdmin.Domain.Entities.System;
+using CasualAdmin.Domain.Infrastructure.Data;
 
 /// <summary>
 /// 部门服务实现

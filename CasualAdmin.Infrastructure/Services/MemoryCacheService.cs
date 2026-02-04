@@ -2,7 +2,7 @@ namespace CasualAdmin.Infrastructure.Services
 {
     using System;
     using System.Threading.Tasks;
-    using CasualAdmin.Application.Interfaces.Services;
+    using CasualAdmin.Domain.Infrastructure.Services;
     using Microsoft.Extensions.Caching.Memory;
 
     /// <summary>

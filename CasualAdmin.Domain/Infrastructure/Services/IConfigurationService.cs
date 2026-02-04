@@ -1,4 +1,4 @@
-namespace CasualAdmin.Application.Interfaces.Services;
+namespace CasualAdmin.Domain.Infrastructure.Services;
 
 /// <summary>
 /// 配置服务接口

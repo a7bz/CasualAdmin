@@ -1,4 +1,6 @@
-namespace CasualAdmin.Application.Models.File;
+namespace CasualAdmin.Domain.Infrastructure.Services.File;
+
+using System.Collections.Generic;
 
 /// <summary>
 /// 分片上传响应

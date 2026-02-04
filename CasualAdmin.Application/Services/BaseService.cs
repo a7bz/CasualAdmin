@@ -1,7 +1,9 @@
 namespace CasualAdmin.Application.Services;
+
 using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Application.Interfaces.Events;
 using CasualAdmin.Application.Interfaces.Services;
+using CasualAdmin.Domain.Infrastructure.Data;
 using global::System.Linq.Expressions;
 
 /// <summary>

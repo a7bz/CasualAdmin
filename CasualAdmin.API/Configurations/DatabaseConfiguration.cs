@@ -1,4 +1,5 @@
 namespace CasualAdmin.API.Configurations;
+using CasualAdmin.Domain.Infrastructure.Data;
 using CasualAdmin.Infrastructure.Data.Context;
 
 public static class DatabaseConfiguration
@@ -19,7 +20,7 @@ public static class DatabaseConfiguration
         });
 
         // 注册IDbContext接口，指向已注册的SqlSugarContext实例
-        services.AddSingleton<CasualAdmin.Application.Interfaces.Base.IDbContext>(provider =>
+        services.AddSingleton<IDbContext>(provider =>
             provider.GetRequiredService<SqlSugarContext>());
     }
 }

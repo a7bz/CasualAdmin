@@ -1,8 +1,8 @@
 namespace CasualAdmin.API.Configurations;
 
+using CasualAdmin.Domain.Infrastructure.Services;
 using CasualAdmin.Infrastructure.Data.Context;
 using FluentValidation;
-
 
 public static class ServiceWarmupConfiguration
 {
@@ -58,7 +58,7 @@ public static class ServiceWarmupConfiguration
 
     private static async Task WarmupCacheServiceAsync(IServiceProvider serviceProvider)
     {
-        var cacheService = serviceProvider.GetRequiredService<Application.Interfaces.Services.ICacheService>();
+        var cacheService = serviceProvider.GetRequiredService<ICacheService>();
         await cacheService.GetAsync<object>("warmup-test");
     }
 }

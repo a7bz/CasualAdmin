@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CasualAdmin.Application.Interfaces.Events;
 using CasualAdmin.Domain.Events;
+using CasualAdmin.Domain.Infrastructure.Events;
 
 /// <summary>
 /// 文件事件存储实现

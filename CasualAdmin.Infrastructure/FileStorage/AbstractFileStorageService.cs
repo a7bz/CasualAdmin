@@ -1,5 +1,5 @@
 namespace CasualAdmin.Infrastructure.FileStorage;
-using CasualAdmin.Application.Interfaces.Services;
+using CasualAdmin.Domain.Infrastructure.Services;
 
 /// <summary>
 /// 文件存储抽象基类
@@ -33,10 +33,10 @@ public abstract class AbstractFileStorageService : IFileStorageService
     public abstract Task<string> GetTemporaryUrlAsync(string filePath, int expiry = 3600);
 
     /// <inheritdoc />
-    public abstract Task<string> InitMultipartUploadAsync(Application.Models.File.UploadPartRequest request);
+    public abstract Task<string> InitMultipartUploadAsync(Domain.Infrastructure.Services.File.UploadPartRequest request);
 
     /// <inheritdoc />
-    public abstract Task<Application.Models.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream);
+    public abstract Task<Domain.Infrastructure.Services.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream);
 
     /// <inheritdoc />
     public abstract Task<string> CompleteMultipartUploadAsync(string fileId);

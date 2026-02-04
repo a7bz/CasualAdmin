@@ -1,4 +1,4 @@
-namespace CasualAdmin.Application.Models.File;
+namespace CasualAdmin.Domain.Infrastructure.Services.File;
 
 /// <summary>
 /// 分片上传请求参数

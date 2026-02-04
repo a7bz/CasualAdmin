@@ -1,5 +1,5 @@
-namespace CasualAdmin.Application.Interfaces.Services;
-using CasualAdmin.Application.Models.File;
+namespace CasualAdmin.Domain.Infrastructure.Services;
+using CasualAdmin.Domain.Infrastructure.Services.File;
 
 /// <summary>
 /// 文件存储服务接口

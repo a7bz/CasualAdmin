@@ -161,7 +161,7 @@ public class LocalFileStorageService : AbstractFileStorageService
     }
 
     /// <inheritdoc />
-    public override Task<string> InitMultipartUploadAsync(CasualAdmin.Application.Models.File.UploadPartRequest request)
+    public override Task<string> InitMultipartUploadAsync(Domain.Infrastructure.Services.File.UploadPartRequest request)
     {
         // 生成唯一的fileId
         var fileId = Guid.NewGuid().ToString();
@@ -189,7 +189,7 @@ public class LocalFileStorageService : AbstractFileStorageService
     }
 
     /// <inheritdoc />
-    public override async Task<CasualAdmin.Application.Models.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream)
+    public override async Task<Domain.Infrastructure.Services.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream)
     {
         // 获取上传会话
         if (!_uploadSessions.TryGetValue(fileId, out var session))
@@ -209,7 +209,7 @@ public class LocalFileStorageService : AbstractFileStorageService
         // 检查是否所有分片都已上传
         var isCompleted = session.UploadedParts.Count == session.TotalParts;
 
-        return new CasualAdmin.Application.Models.File.UploadPartResponse
+        return new Domain.Infrastructure.Services.File.UploadPartResponse
         {
             IsCompleted = isCompleted,
             FileUrl = null, // 不自动完成上传，由客户端手动调用CompleteMultipartUploadAsync

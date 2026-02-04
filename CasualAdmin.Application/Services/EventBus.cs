@@ -1,8 +1,9 @@
 namespace CasualAdmin.Application.Services;
+
 using CasualAdmin.Application.Interfaces.Events;
 using CasualAdmin.Domain.Events;
+using CasualAdmin.Domain.Infrastructure.Events;
 using global::System;
-using global::System.Reflection;
 using global::System.Threading;
 using global::System.Threading.Channels;
 using global::System.Threading.Tasks;

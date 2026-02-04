@@ -1,6 +1,6 @@
 namespace CasualAdmin.Infrastructure.Factories
 {
-    using CasualAdmin.Application.Interfaces.Services;
+    using CasualAdmin.Domain.Infrastructure.Services;
     using CasualAdmin.Infrastructure.Cache;
     using CasualAdmin.Infrastructure.Services;
     using Microsoft.Extensions.Caching.Memory;

@@ -149,7 +149,7 @@ public class S3FileStorageService : AbstractFileStorageService
     }
 
     /// <inheritdoc />
-    public override async Task<string> InitMultipartUploadAsync(CasualAdmin.Application.Models.File.UploadPartRequest request)
+    public override async Task<string> InitMultipartUploadAsync(Domain.Infrastructure.Services.File.UploadPartRequest request)
     {
         // 生成唯一文件名
         var uniqueFileName = GenerateUniqueFileName(request.FileName ?? "");
@@ -183,7 +183,7 @@ public class S3FileStorageService : AbstractFileStorageService
     }
 
     /// <inheritdoc />
-    public override async Task<CasualAdmin.Application.Models.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream)
+    public override async Task<Domain.Infrastructure.Services.File.UploadPartResponse> UploadPartAsync(string fileId, int partIndex, Stream fileStream)
     {
         // 检查上传会话是否存在
         if (!_uploadSessions.TryGetValue(fileId, out var session))
@@ -215,7 +215,7 @@ public class S3FileStorageService : AbstractFileStorageService
         var isCompleted = session.UploadedParts.Count == session.TotalParts;
 
         // 返回上传结果
-        return new CasualAdmin.Application.Models.File.UploadPartResponse
+        return new Domain.Infrastructure.Services.File.UploadPartResponse
         {
             IsCompleted = isCompleted,
             FileUrl = null, // 不自动完成上传，由客户端手动调用CompleteMultipartUploadAsync

@@ -3,7 +3,7 @@ namespace CasualAdmin.Infrastructure.Services
     using System;
     using System.Text.Json;
     using System.Threading.Tasks;
-    using CasualAdmin.Application.Interfaces.Services;
+    using CasualAdmin.Domain.Infrastructure.Services;
     using CasualAdmin.Infrastructure.Cache;
     using Microsoft.Extensions.Options;
     using StackExchange.Redis;

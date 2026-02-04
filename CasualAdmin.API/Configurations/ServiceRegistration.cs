@@ -1,9 +1,11 @@
 namespace CasualAdmin.API.Configurations;
+
 using System.Reflection;
-using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Application.Interfaces.Events;
-using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Application.Services;
+using CasualAdmin.Domain.Infrastructure.Data;
+using CasualAdmin.Domain.Infrastructure.Events;
+using CasualAdmin.Domain.Infrastructure.Services;
 using CasualAdmin.Infrastructure.Data;
 using CasualAdmin.Infrastructure.Data.Repositories;
 using CasualAdmin.Infrastructure.Factories;

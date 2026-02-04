@@ -1,8 +1,9 @@
-namespace CasualAdmin.Application.Interfaces.Events;
+namespace CasualAdmin.Domain.Infrastructure.Events;
+
 using CasualAdmin.Domain.Events;
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 /// <summary>
 /// 事件存储接口，用于持久化存储领域事件

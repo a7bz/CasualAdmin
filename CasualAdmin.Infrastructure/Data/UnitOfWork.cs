@@ -1,9 +1,9 @@
 namespace CasualAdmin.Infrastructure.Data;
+
 using System.Data;
-using CasualAdmin.Application.Interfaces.Base;
+using CasualAdmin.Domain.Infrastructure.Data;
 using CasualAdmin.Infrastructure.Data.Context;
 using CasualAdmin.Infrastructure.Data.Repositories;
-using SqlSugar;
 
 /// <summary>
 /// 工作单元实现，用于管理事务和协调多个仓储

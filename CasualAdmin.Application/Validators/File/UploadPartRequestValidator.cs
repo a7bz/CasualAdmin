@@ -1,6 +1,7 @@
 namespace CasualAdmin.Application.Validators.File;
 
-using CasualAdmin.Application.Models.File;
+
+using CasualAdmin.Domain.Infrastructure.Services.File;
 using FluentValidation;
 
 /// <summary>

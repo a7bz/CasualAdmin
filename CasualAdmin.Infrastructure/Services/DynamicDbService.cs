@@ -1,5 +1,5 @@
 namespace CasualAdmin.Infrastructure.Services;
-using CasualAdmin.Application.Interfaces.Services;
+using CasualAdmin.Domain.Infrastructure.Services;
 using CasualAdmin.Infrastructure.Data.Context;
 
 /// <summary>

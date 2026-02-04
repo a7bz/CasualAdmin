@@ -1,5 +1,5 @@
 namespace CasualAdmin.Application.Interfaces.System;
-using CasualAdmin.Application.Interfaces;
+
 using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Domain.Entities.System;
 

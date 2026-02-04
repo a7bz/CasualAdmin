@@ -3,8 +3,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Domain.Entities;
+using CasualAdmin.Domain.Infrastructure.Data;
 using SqlSugar;
 
 /// <summary>

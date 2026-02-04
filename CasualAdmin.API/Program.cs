@@ -2,6 +2,11 @@ using CasualAdmin.API.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 配置热重载
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 // 配置端口
 var port = builder.Configuration.GetValue("Port", 5000);
 builder.WebHost.UseUrls($"http://*:{port}");

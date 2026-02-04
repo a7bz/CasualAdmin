@@ -19,6 +19,7 @@ public class AuthServiceTests
     private readonly Mock<IConfiguration> _configurationMock;
     private readonly Mock<IRoleService> _roleServiceMock;
     private readonly Mock<IUserService> _userServiceMock;
+    private readonly Mock<IPermissionService> _permissionServiceMock;
     private readonly AuthService _authService;
 
     /// <summary>
@@ -39,8 +40,11 @@ public class AuthServiceTests
         // 初始化模拟用户服务
         _userServiceMock = new Mock<IUserService>();
 
+        // 初始化模拟权限服务
+        _permissionServiceMock = new Mock<IPermissionService>();
+
         // 创建被测服务实例
-        _authService = new AuthService(_configurationMock.Object, _roleServiceMock.Object, _userServiceMock.Object);
+        _authService = new AuthService(_configurationMock.Object, _roleServiceMock.Object, _userServiceMock.Object, _permissionServiceMock.Object);
     }
 
     /// <summary>
@@ -56,11 +60,18 @@ public class AuthServiceTests
 
         var roles = new List<SysRole>
         {
-            new() { Name = "Admin" },
-            new() { Name = "User" }
+            new() { Name = "Admin", RoleId = Guid.NewGuid() },
+            new() { Name = "User", RoleId = Guid.NewGuid() }
+        };
+
+        var permissions = new List<SysPermission>
+        {
+            new() { PermissionCode = "system:user:add" },
+            new() { PermissionCode = "system:user:edit" }
         };
 
         _roleServiceMock.Setup(r => r.GetRolesByUserIdAsync(user.UserId)).ReturnsAsync(roles);
+        _permissionServiceMock.Setup(p => p.GetPermissionsByRoleIdsAsync(It.IsAny<List<Guid>>())).ReturnsAsync(permissions);
 
         // Act
         var token = await _authService.GenerateJwtToken(user);
@@ -79,6 +90,8 @@ public class AuthServiceTests
         Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.Name && c.Value == user.Username);
         Assert.Contains(jwtToken.Claims, c => c.Type == ClaimTypes.Role && c.Value == "Admin");
         Assert.Contains(jwtToken.Claims, c => c.Type == ClaimTypes.Role && c.Value == "User");
+        Assert.Contains(jwtToken.Claims, c => c.Type == "permission" && c.Value == "system:user:add");
+        Assert.Contains(jwtToken.Claims, c => c.Type == "permission" && c.Value == "system:user:edit");
     }
 
     /// <summary>

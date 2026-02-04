@@ -5,6 +5,8 @@ using CasualAdmin.Application.Interfaces.System;
 using CasualAdmin.Application.Services;
 using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Domain.Infrastructure.Data;
+using CasualAdmin.Domain.Infrastructure.Services;
+
 
 /// <summary>
 /// 角色服务实现
@@ -14,6 +16,7 @@ public class RoleService : BaseService<SysRole>, IRoleService
     private readonly IRepository<SysUserRole> _userRoleRepository;
     private readonly IRepository<SysUser> _userRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
     /// <summary>
     /// 构造函数
@@ -24,12 +27,14 @@ public class RoleService : BaseService<SysRole>, IRoleService
     /// <param name="userRoleRepository">用户角色关联仓储</param>
     /// <param name="userRepository">用户仓储</param>
     /// <param name="unitOfWork">工作单元</param>
-    public RoleService(IRepository<SysRole> roleRepository, IValidationService validationService, IEventBus eventBus, IRepository<SysUserRole> userRoleRepository, IRepository<SysUser> userRepository, IUnitOfWork unitOfWork)
+    /// <param name="cacheService">缓存服务</param>
+    public RoleService(IRepository<SysRole> roleRepository, IValidationService validationService, IEventBus eventBus, IRepository<SysUserRole> userRoleRepository, IRepository<SysUser> userRepository, IUnitOfWork unitOfWork, ICacheService cacheService)
         : base(roleRepository, validationService, eventBus)
     {
         _userRoleRepository = userRoleRepository;
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
     }
 
     /// <summary>
@@ -147,6 +152,11 @@ public class RoleService : BaseService<SysRole>, IRoleService
         };
 
         await _userRoleRepository.AddAsync(userRole);
+
+        // 清除用户权限缓存
+        var cacheKey = $"user_permissions:{userId}";
+        await _cacheService.RemoveAsync(cacheKey);
+
         return true;
     }
 
@@ -167,6 +177,11 @@ public class RoleService : BaseService<SysRole>, IRoleService
 
         // 删除关联
         await _userRoleRepository.DeleteRangeAsync(userRoles);
+
+        // 清除用户权限缓存
+        var cacheKey = $"user_permissions:{userId}";
+        await _cacheService.RemoveAsync(cacheKey);
+
         return true;
     }
 
@@ -186,6 +201,21 @@ public class RoleService : BaseService<SysRole>, IRoleService
 
         var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
         return await _repository.FindAsync(r => roleIds.Contains(r.RoleId));
+    }
+
+    /// <summary>
+    /// 根据角色名称列表获取角色
+    /// </summary>
+    /// <param name="roleNames">角色名称列表</param>
+    /// <returns>角色列表</returns>
+    public async Task<List<SysRole>> GetRolesByNamesAsync(List<string> roleNames)
+    {
+        if (roleNames == null || roleNames.Count == 0)
+        {
+            return new List<SysRole>();
+        }
+
+        return await _repository.FindAsync(r => roleNames.Contains(r.Name));
     }
 
     /// <summary>

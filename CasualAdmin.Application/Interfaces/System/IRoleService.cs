@@ -32,6 +32,12 @@ public interface IRoleService : IBaseService<SysRole>
     Task<List<SysRole>> GetRolesByUserIdAsync(Guid userId);
 
     /// <summary>
+    /// 根据角色名称列表获取角色
+    /// </summary>
+    /// <param name="roleNames">角色名称列表</param>
+    /// <returns>角色列表</returns>
+    Task<List<SysRole>> GetRolesByNamesAsync(List<string> roleNames);
+    /// <summary>
     /// 获取角色用户列表
     /// </summary>
     /// <param name="roleId">角色ID</param>

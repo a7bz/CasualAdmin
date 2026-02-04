@@ -5,6 +5,7 @@ using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Application.Services.System;
 using CasualAdmin.Domain.Entities.System;
 using CasualAdmin.Domain.Infrastructure.Data;
+using CasualAdmin.Domain.Infrastructure.Services;
 using global::System.Data;
 using global::System.Linq.Expressions;
 using Moq;
@@ -21,6 +22,7 @@ public class RoleServiceTests
     private readonly Mock<IRepository<SysUserRole>> _userRoleRepositoryMock;
     private readonly Mock<IRepository<SysUser>> _userRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly RoleService _roleService;
 
     /// <summary>
@@ -35,6 +37,7 @@ public class RoleServiceTests
         _userRoleRepositoryMock = new Mock<IRepository<SysUserRole>>();
         _userRepositoryMock = new Mock<IRepository<SysUser>>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _cacheServiceMock = new Mock<ICacheService>();
 
         // 配置模拟验证服务
         _validationServiceMock.Setup(v => v.ValidateAndThrow(It.IsAny<SysRole>())).Verifiable();
@@ -46,7 +49,8 @@ public class RoleServiceTests
             _eventBusMock.Object,
             _userRoleRepositoryMock.Object,
             _userRepositoryMock.Object,
-            _unitOfWorkMock.Object
+            _unitOfWorkMock.Object,
+            _cacheServiceMock.Object
         );
     }
 

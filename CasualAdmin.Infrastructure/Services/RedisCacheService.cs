@@ -5,8 +5,6 @@ namespace CasualAdmin.Infrastructure.Services
     using System.Threading.Tasks;
     using CasualAdmin.Application.Interfaces.Services;
     using CasualAdmin.Infrastructure.Cache;
-    using Microsoft.Extensions.Logging;
-
     using Microsoft.Extensions.Options;
     using StackExchange.Redis;
 
@@ -18,36 +16,32 @@ namespace CasualAdmin.Infrastructure.Services
         private readonly IDatabase _redisDatabase;
         private readonly ConnectionMultiplexer _redisConnection;
         private readonly string _keyPrefix;
-        private readonly ILogger<RedisCacheService> _logger;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="options">缓存配置选项</param>
-        /// <param name="logger">日志记录器</param>
-        public RedisCacheService(IOptions<CacheOptions> options, ILogger<RedisCacheService> logger)
+        public RedisCacheService(IOptions<CacheOptions> options)
         {
             var redisOptions = options.Value.Redis;
             _keyPrefix = redisOptions.KeyPrefix;
-            _logger = logger;
 
             var configurationOptions = ConfigurationOptions.Parse(redisOptions.BuildConnectionString());
             configurationOptions.ConnectTimeout = redisOptions.ConnectTimeout;
             configurationOptions.ConnectRetry = 3;
 
-            _logger.LogInformation("正在连接 Redis 服务器: {Host}:{Port}, 数据库: {Database}, 超时时间: {Timeout}ms",
-                redisOptions.Host, redisOptions.Port, redisOptions.Database, redisOptions.ConnectTimeout);
+            Console.WriteLine($"正在连接 Redis 服务器: {redisOptions.Host}:{redisOptions.Port}, 数据库: {redisOptions.Database}, 超时时间: {redisOptions.ConnectTimeout}ms");
 
             try
             {
                 _redisConnection = ConnectionMultiplexer.Connect(configurationOptions);
                 _redisConnection.ConnectionFailed += OnConnectionFailed;
                 _redisDatabase = _redisConnection.GetDatabase(redisOptions.Database);
-                _logger.LogInformation("Redis 连接成功");
+                Console.WriteLine("Redis 连接成功");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Redis 连接失败: {Message}", ex.Message);
+                Console.WriteLine($"Redis 连接失败: {ex.Message}");
                 throw;
             }
         }
@@ -59,11 +53,11 @@ namespace CasualAdmin.Infrastructure.Services
         {
             if (e.Exception is TimeoutException)
             {
-                _logger.LogWarning("Redis 连接超时: {EndPoint}, 异常: {Message}", e.EndPoint, e.Exception?.Message);
+                Console.WriteLine($"Redis 连接超时: {e.EndPoint}, 异常: {e.Exception?.Message}");
             }
             else
             {
-                _logger.LogError(e.Exception, "Redis 连接失败: {EndPoint}, 异常: {Message}", e.EndPoint, e.Exception?.Message);
+                Console.WriteLine($"Redis 连接失败: {e.EndPoint}, 异常: {e.Exception?.Message}");
             }
         }
 

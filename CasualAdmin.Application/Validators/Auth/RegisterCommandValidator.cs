@@ -1,9 +1,9 @@
 namespace CasualAdmin.Application.Validators.Auth;
 
-using global::System.Text.RegularExpressions;
 using CasualAdmin.Application.Commands.Auth;
 using CasualAdmin.Application.Interfaces.System;
 using FluentValidation;
+using global::System.Text.RegularExpressions;
 
 /// <summary>
 /// 注册命令验证器

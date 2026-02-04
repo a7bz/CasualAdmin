@@ -52,8 +52,12 @@ public static class MiddlewareConfiguration
         // 添加异常处理中间件
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+        // 从配置文件中读取速率限制选项
+        var rateLimitingOptions = new RateLimitingOptions();
+        app.ApplicationServices.GetRequiredService<IConfiguration>().GetSection("RateLimiting").Bind(rateLimitingOptions);
+
         // 启用 API 速率限制中间件
-        app.UseRateLimiting();
+        app.UseRateLimiting(rateLimitingOptions);
 
         // 从配置文件中读取日志中间件选项
         var loggingOptions = new LoggingOptions();

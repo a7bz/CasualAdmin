@@ -95,8 +95,10 @@ public class LoggingMiddleware
         {
             // 记录响应信息
             var elapsedTime = Stopwatch.GetElapsedTime(startTime);
+            // 优化时间显示格式，使用秒和毫秒，最多三位小数
+            var formattedElapsedTime = $"{elapsedTime.TotalSeconds:F3}s";
             _logger.LogInformation("Request completed: {Method} {Path} {StatusCode} in {ElapsedTime}",
-                context.Request.Method, context.Request.Path, context.Response.StatusCode, elapsedTime);
+                context.Request.Method, context.Request.Path, context.Response.StatusCode, formattedElapsedTime);
 
             // 记录响应体（仅在开发环境或明确配置时）
             if (_options.IncludeResponseBody && (_environment?.IsDevelopment() ?? false) && responseBodyStream != null)

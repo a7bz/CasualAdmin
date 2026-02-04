@@ -1,4 +1,5 @@
 namespace CasualAdmin.Infrastructure.FileStorage;
+
 using System.Collections.Concurrent;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -195,7 +196,7 @@ public class S3FileStorageService : AbstractFileStorageService
         var partNumber = partIndex + 1;
 
         // 创建上传分片请求
-        var uploadRequest = new Amazon.S3.Model.UploadPartRequest
+        var uploadRequest = new UploadPartRequest
         {
             BucketName = _config.BucketName,
             Key = fileId,

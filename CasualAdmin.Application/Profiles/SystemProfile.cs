@@ -1,4 +1,5 @@
 namespace CasualAdmin.Application.Profiles;
+
 using AutoMapper;
 using CasualAdmin.Application.Models.DTOs.Requests.System;
 using CasualAdmin.Application.Models.DTOs.Responses.System;
@@ -27,7 +28,7 @@ public class SystemProfile : Profile
             .AfterMap((src, dest) =>
             {
                 // 密码加密处理
-                var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<CasualAdmin.Domain.Entities.System.SysUser>();
+                var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<SysUser>();
                 var salt = Guid.NewGuid().ToString();
                 var hashedPassword = passwordHasher.HashPassword(dest, src.Password);
                 dest.SetPassword(hashedPassword, salt);
@@ -38,7 +39,7 @@ public class SystemProfile : Profile
                 // 如果提供了新密码，则重新加密
                 if (!string.IsNullOrEmpty(src.Password))
                 {
-                    var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<CasualAdmin.Domain.Entities.System.SysUser>();
+                    var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<SysUser>();
                     var salt = Guid.NewGuid().ToString();
                     var hashedPassword = passwordHasher.HashPassword(dest, src.Password);
                     dest.SetPassword(hashedPassword, salt);

@@ -9,6 +9,8 @@ public static class SerilogConfiguration
         builder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application", "CasualAdmin")
+            .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
         );
 
         // 确保在程序退出时关闭Serilog

@@ -1,4 +1,5 @@
 namespace CasualAdmin.API.Configurations;
+
 using CasualAdmin.Domain.Infrastructure.Data;
 using CasualAdmin.Infrastructure.Data.Context;
 
@@ -7,7 +8,7 @@ public static class DatabaseConfiguration
     public static void ConfigureDatabase(this IServiceCollection services)
     {
         // 注册SqlSugar上下文，同时注册接口和实现
-        services.AddSingleton<SqlSugarContext>(provider =>
+        services.AddSingleton(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
             var connectionString = configuration.GetConnectionString("DefaultConnection")

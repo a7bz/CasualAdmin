@@ -1,4 +1,5 @@
 namespace CasualAdmin.API.Configurations;
+
 using System.Reflection;
 using IGeekFan.AspNetCore.Knife4jUI;
 
@@ -37,7 +38,7 @@ public static class SwaggerConfiguration
 
         // 获取应用程序正在使用的地址
         var address = app.Urls.FirstOrDefault() ?? $"http://localhost:{app.Configuration.GetValue("Port", 5000)}";
-        var basePath = app.Configuration.GetValue<string>("BasePath", string.Empty);
+        var basePath = app.Configuration.GetValue("BasePath", string.Empty);
         Console.WriteLine($"启动成功，swagger：{address}{basePath?.TrimEnd('/')}/swagger");
     }
 }

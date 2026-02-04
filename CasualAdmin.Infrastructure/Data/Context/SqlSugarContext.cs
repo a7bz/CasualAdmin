@@ -1,4 +1,5 @@
 namespace CasualAdmin.Infrastructure.Data.Context;
+
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -109,7 +110,7 @@ public class SqlSugarContext : SqlSugarClient, IDbContext
     /// </summary>
     private void ConfigureEntityMappings()
     {
-        bool showSql = _configuration.GetValue<bool>("SqlSugar:ShowSql", true);
+        bool showSql = _configuration.GetValue("SqlSugar:ShowSql", true);
 
         Aop.OnLogExecuting = (sql, pars) =>
         {

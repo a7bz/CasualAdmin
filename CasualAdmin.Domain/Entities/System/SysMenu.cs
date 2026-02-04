@@ -6,6 +6,8 @@ using SqlSugar;
 /// 菜单实体
 /// </summary>
 [SugarTable("sys_menus")]
+[SugarIndex("idx_parent_id", nameof(ParentId), OrderByType.Asc)]
+[SugarIndex("idx_menu_type_status", nameof(MenuType), OrderByType.Asc, nameof(Status), OrderByType.Asc)]
 public class SysMenu : BaseEntity
 {
     /// <summary>

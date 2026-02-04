@@ -5,6 +5,8 @@ using SqlSugar;
 /// 用户角色关联实体
 /// </summary>
 [SugarTable("sys_user_roles")]
+[SugarIndex("idx_user_id", nameof(UserId), OrderByType.Asc)]
+[SugarIndex("idx_role_id", nameof(RoleId), OrderByType.Asc)]
 public class SysUserRole : BaseEntity
 {
     /// <summary>

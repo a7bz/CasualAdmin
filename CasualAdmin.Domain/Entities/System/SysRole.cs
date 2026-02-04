@@ -6,6 +6,8 @@ using SqlSugar;
 /// 角色实体
 /// </summary>
 [SugarTable("sys_roles")]
+[SugarIndex("idx_role_code", nameof(RoleCode), OrderByType.Asc)]
+[SugarIndex("idx_status", nameof(Status), OrderByType.Asc)]
 public class SysRole : BaseEntity
 {
     /// <summary>

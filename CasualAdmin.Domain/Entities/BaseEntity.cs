@@ -4,6 +4,8 @@ using SqlSugar;
 /// <summary>
 /// 基础实体类，包含多租户支持
 /// </summary>
+[SugarIndex("idx_is_deleted", nameof(IsDeleted), OrderByType.Asc)]
+[SugarIndex("idx_tenant_id", nameof(TenantId), OrderByType.Asc)]
 public abstract class BaseEntity
 {
     /// <summary>
@@ -19,6 +21,7 @@ public abstract class BaseEntity
     /// <summary>
     /// 是否删除
     /// </summary>
+    [SugarColumn(IsNullable = true)]
     public bool IsDeleted { get; set; } = false;
 
     /// <summary>

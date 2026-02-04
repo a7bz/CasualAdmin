@@ -5,6 +5,8 @@ using SqlSugar;
 /// 角色权限关联实体
 /// </summary>
 [SugarTable("sys_role_permissions")]
+[SugarIndex("idx_role_id", nameof(RoleId), OrderByType.Asc)]
+[SugarIndex("idx_permission_id", nameof(PermissionId), OrderByType.Asc)]
 public class SysRolePermission : BaseEntity
 {
     /// <summary>

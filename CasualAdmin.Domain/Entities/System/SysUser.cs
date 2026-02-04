@@ -7,6 +7,10 @@ using SqlSugar;
 /// 用户实体
 /// </summary>
 [SugarTable("sys_users")]
+[SugarIndex("idx_username", nameof(Username), OrderByType.Asc, isUnique: true)]
+[SugarIndex("idx_email", nameof(Email), OrderByType.Asc, isUnique: true)]
+[SugarIndex("idx_dept_id", nameof(DeptId), OrderByType.Asc)]
+[SugarIndex("idx_status", nameof(Status), OrderByType.Asc)]
 public class SysUser : BaseEntity
 {
     /// <summary>

@@ -5,6 +5,9 @@ using SqlSugar;
 /// 登录日志实体
 /// </summary>
 [SugarTable("sys_login_logs")]
+[SugarIndex("idx_user_id", nameof(UserId), OrderByType.Asc)]
+[SugarIndex("idx_login_time", nameof(LoginTime), OrderByType.Desc)]
+[SugarIndex("idx_user_login_time", nameof(UserId), OrderByType.Asc, nameof(LoginTime), OrderByType.Desc)]
 public class SysLoginLog : BaseEntity
 {
     /// <summary>

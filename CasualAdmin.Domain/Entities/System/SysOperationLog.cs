@@ -5,6 +5,8 @@ using SqlSugar;
 /// 操作日志实体
 /// </summary>
 [SugarTable("sys_operation_logs")]
+[SugarIndex("idx_user_id", nameof(UserId), OrderByType.Asc)]
+[SugarIndex("idx_module", nameof(Module), OrderByType.Asc)]
 public class SysOperationLog : BaseEntity
 {
     /// <summary>

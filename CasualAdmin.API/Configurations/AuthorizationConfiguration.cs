@@ -2,10 +2,11 @@ namespace CasualAdmin.API.Configurations;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 
 public static class AuthorizationConfiguration
 {
-    public static void ConfigureAuthorization(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureAuthorization(this IServiceCollection services)
     {
         // 注册授权排除路径配置
         services.AddSingleton(sp =>
@@ -17,23 +18,19 @@ public static class AuthorizationConfiguration
         });
 
         // 添加全局授权策略
-        services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                 .RequireAssertion(context =>
                 {
-                    // 检查请求路径是否为授权排除路径
-                    var httpContext = context.Resource as HttpContext;
-                    if (httpContext != null)
-                    {
-                        var excludePaths = httpContext.RequestServices.GetRequiredService<AuthorizationExcludePaths>();
-                        return excludePaths.ShouldSkipAuthorization(httpContext.Request.Path) ||
-                               context.User.Identity?.IsAuthenticated == true;
-                    }
-                    return true;
+                    if (context.Resource is not HttpContext httpContext) return true;
+
+                    var excludePaths = httpContext.RequestServices
+                        .GetRequiredService<AuthorizationExcludePaths>();
+
+                    return excludePaths.ShouldSkipAuthorization(httpContext.Request.Path) ||
+                           context.User.Identity?.IsAuthenticated == true;
                 })
-                .Build();
-        });
+                .Build());
     }
 
     public static void ConfigureFluentValidation(this IServiceCollection services)

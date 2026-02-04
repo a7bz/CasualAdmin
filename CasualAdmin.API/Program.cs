@@ -13,7 +13,7 @@ builder.Services.RegisterServices(builder.Configuration);
 builder.Services.ConfigureAutoMapper();
 builder.Services.ConfigureJwt(builder.Configuration);
 builder.Services.ConfigureSwagger();
-builder.Services.ConfigureAuthorization(builder.Configuration);
+builder.Services.ConfigureAuthorization();
 builder.Services.ConfigureFluentValidation();
 builder.Services.AddControllers();
 

@@ -52,9 +52,9 @@ public class PermissionService : BaseService<SysPermission>, IPermissionService
         // 从数据库获取
         // 1. 获取该角色的所有角色权限关联记录
         var rolePermissions = await _rolePermissionRepository.FindAsync(rp => rp.RoleId == roleId);
-        if (!rolePermissions.Any())
+        if (rolePermissions.Count == 0)
         {
-            return new List<SysPermission>();
+            return [];
         }
 
         // 2. 获取权限ID列表
@@ -76,9 +76,9 @@ public class PermissionService : BaseService<SysPermission>, IPermissionService
     /// <returns>权限列表</returns>
     public async Task<List<SysPermission>> GetPermissionsByRoleIdsAsync(List<Guid> roleIds)
     {
-        if (roleIds == null || !roleIds.Any())
+        if (roleIds == null || roleIds.Count == 0)
         {
-            return new List<SysPermission>();
+            return [];
         }
 
         var cacheKey = $"permission:roles:{string.Join(",", roleIds.OrderBy(id => id))}";
@@ -92,9 +92,9 @@ public class PermissionService : BaseService<SysPermission>, IPermissionService
         // 从数据库获取
         // 1. 获取这些角色的所有角色权限关联记录
         var rolePermissions = await _rolePermissionRepository.FindAsync(rp => roleIds.Contains(rp.RoleId));
-        if (!rolePermissions.Any())
+        if (rolePermissions.Count == 0)
         {
-            return new List<SysPermission>();
+            return [];
         }
 
         // 2. 获取权限ID列表（去重）

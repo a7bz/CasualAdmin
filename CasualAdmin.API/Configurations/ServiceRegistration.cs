@@ -11,11 +11,44 @@ using CasualAdmin.Infrastructure.Data.Repositories;
 using CasualAdmin.Infrastructure.Factories;
 using CasualAdmin.Infrastructure.FileStorage;
 using CasualAdmin.Infrastructure.Services;
+using Microsoft.AspNetCore.ResponseCompression;
+
 
 public static class ServiceRegistration
 {
     public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // 注册响应压缩服务
+        services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+            {
+                "application/json",
+                "application/javascript",
+                "text/html",
+                "text/css",
+                "text/plain",
+                "text/xml",
+                "application/xml",
+                "application/xml+rss"
+            });
+        });
+
+        // 配置 Brotli 压缩级别
+        services.Configure<BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = System.IO.Compression.CompressionLevel.Optimal;
+        });
+
+        // 配置 Gzip 压缩级别
+        services.Configure<GzipCompressionProviderOptions>(options =>
+        {
+            options.Level = System.IO.Compression.CompressionLevel.Optimal;
+        });
+
         // 注册仓储
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

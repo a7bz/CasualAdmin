@@ -47,6 +47,9 @@ public static class MiddlewareConfiguration
             });
         }
 
+        // 启用响应压缩中间件
+        app.UseResponseCompression();
+
         app.UseRouting();
 
         // 添加日志上下文中间件（必须在异常处理中间件之前）

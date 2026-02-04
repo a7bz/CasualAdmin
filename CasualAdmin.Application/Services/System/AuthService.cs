@@ -15,6 +15,7 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly IRoleService _roleService;
     private readonly IUserService _userService;
+    private readonly IPermissionService _permissionService;
 
     /// <summary>
     /// 构造函数
@@ -22,11 +23,13 @@ public class AuthService : IAuthService
     /// <param name="configuration">配置服务</param>
     /// <param name="roleService">角色服务</param>
     /// <param name="userService">用户服务</param>
-    public AuthService(IConfiguration configuration, IRoleService roleService, IUserService userService)
+    /// <param name="permissionService">权限服务</param>
+    public AuthService(IConfiguration configuration, IRoleService roleService, IUserService userService, IPermissionService permissionService)
     {
         _configuration = configuration;
         _roleService = roleService;
         _userService = userService;
+        _permissionService = permissionService;
     }
 
     /// <summary>
@@ -62,6 +65,17 @@ public class AuthService : IAuthService
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role.Name));
+        }
+
+        // 获取用户权限列表并添加到token
+        if (roles.Count > 0)
+        {
+            var roleIds = roles.Select(r => r.RoleId).ToList();
+            var permissions = await _permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("permission", permission.PermissionCode));
+            }
         }
 
         var jwtKey = _configuration["Jwt:Key"] ?? string.Empty;

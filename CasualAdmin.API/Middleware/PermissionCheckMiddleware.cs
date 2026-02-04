@@ -1,8 +1,11 @@
 namespace CasualAdmin.API.Middleware;
+
 using System.Security.Claims;
 using System.Text.Json;
 using CasualAdmin.API.Configurations;
+using CasualAdmin.API.Filters;
 using CasualAdmin.Application.Interfaces.System;
+using CasualAdmin.Domain.Infrastructure.Services;
 using CasualAdmin.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -80,29 +83,121 @@ public class PermissionCheckMiddleware
 
             var userId = Guid.Parse(userIdClaim.Value);
 
-            // 获取权限服务
-            var permissionService = context.RequestServices.GetRequiredService<IPermissionService>();
-            var userService = context.RequestServices.GetRequiredService<IUserService>();
-            var roleService = context.RequestServices.GetRequiredService<IRoleService>();
+            // 从Token中直接读取角色（避免查询sys_user_roles表）
+            var roleClaims = context.User.FindAll(ClaimTypes.Role);
+            var roleNames = roleClaims.Select(c => c.Value).ToList();
 
-            // 获取用户角色
-            var roles = await roleService.GetRolesByUserIdAsync(userId);
-            if (roles.Count == 0)
+            List<string> permissionCodes = new List<string>();
+
+            // 优先从Token中读取权限（新Token）
+            var permissionClaims = context.User.FindAll("permission");
+            var tokenPermissions = permissionClaims.Select(c => c.Value).ToList();
+
+            if (tokenPermissions.Count > 0)
             {
-                // 用户没有角色，允许访问（权限控制交给具体的控制器方法）
-                await _next(context);
-                return;
+                // Token中包含权限，直接使用
+                permissionCodes = tokenPermissions;
             }
+            else
+            {
+                // Token中不包含权限，回退到缓存和数据库查询（兼容旧Token）
+                var cacheService = context.RequestServices.GetRequiredService<ICacheService>();
+                var cacheKey = $"user_permissions:{userId}:{string.Join(",", roleNames.OrderBy(r => r))}";
 
-            // 获取所有角色的权限（批量查询，避免N+1问题）
-            var roleIds = roles.Select(r => r.RoleId).ToList();
-            var permissions = await permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+                // 尝试从缓存获取权限
+                var cachedPermissions = await cacheService.GetAsync<List<string>>(cacheKey);
+                if (cachedPermissions != null)
+                {
+                    permissionCodes = cachedPermissions;
+                }
+                else
+                {
+                    // 缓存未命中，查询数据库
+                    var permissionService = context.RequestServices.GetRequiredService<IPermissionService>();
+                    var roleService = context.RequestServices.GetRequiredService<IRoleService>();
 
-            // 提取权限代码
-            var permissionCodes = permissions.Select(p => p.PermissionCode).Distinct().ToList();
+                    // 如果Token中没有角色信息，从数据库查询（兼容旧Token）
+                    if (roleNames.Count == 0)
+                    {
+                        var roles = await roleService.GetRolesByUserIdAsync(userId);
+                        roleNames = roles.Select(r => r.Name).ToList();
+                    }
+
+                    if (roleNames.Count > 0)
+                    {
+                        // 根据角色名称查询角色ID，然后获取权限
+                        var roleEntities = await roleService.GetRolesByNamesAsync(roleNames);
+                        if (roleEntities.Count > 0)
+                        {
+                            // 获取所有角色的权限（批量查询，避免N+1问题）
+                            var roleIds = roleEntities.Select(r => r.RoleId).ToList();
+                            var permissions = await permissionService.GetPermissionsByRoleIdsAsync(roleIds);
+
+                            // 提取权限代码
+                            permissionCodes = permissions.Select(p => p.PermissionCode).Distinct().ToList();
+
+                            // 缓存权限信息，缓存30分钟
+                            await cacheService.SetAsync(cacheKey, permissionCodes, TimeSpan.FromMinutes(30));
+                        }
+                    }
+                }
+            }
 
             // 将权限信息存储到HttpContext中，供后续使用
             context.Items["UserPermissions"] = permissionCodes;
+
+            // 检查endpoint是否有权限要求特性
+            endpoint = context.GetEndpoint();
+            if (endpoint != null)
+            {
+                // 检查是否有RequirePermissionAttribute（需要特定权限）
+                var requiredPermission = endpoint.Metadata.GetMetadata<RequirePermissionAttribute>();
+                if (requiredPermission != null)
+                {
+                    if (!CasualAdmin.Shared.Helpers.PermissionHelper.HasPermission(permissionCodes, requiredPermission.Permission))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        var response = ApiResponse<object>.Forbidden($"需要权限: {requiredPermission.Permission}");
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                        return;
+                    }
+                }
+
+                // 检查是否有RequireAnyPermissionAttribute（需要满足任意一个权限）
+                var requireAnyPermission = endpoint.Metadata.GetMetadata<RequireAnyPermissionAttribute>();
+                if (requireAnyPermission != null)
+                {
+                    var hasAnyPermission = requireAnyPermission.Permissions.Any(perm =>
+                        CasualAdmin.Shared.Helpers.PermissionHelper.HasPermission(permissionCodes, perm));
+
+                    if (!hasAnyPermission)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        var response = ApiResponse<object>.Forbidden($"需要以下任意权限之一: {string.Join(", ", requireAnyPermission.Permissions)}");
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                        return;
+                    }
+                }
+
+                // 检查是否有RequireAllPermissionsAttribute（需要满足所有权限）
+                var requireAllPermissions = endpoint.Metadata.GetMetadata<RequireAllPermissionsAttribute>();
+                if (requireAllPermissions != null)
+                {
+                    var hasAllPermissions = requireAllPermissions.Permissions.All(perm =>
+                        CasualAdmin.Shared.Helpers.PermissionHelper.HasPermission(permissionCodes, perm));
+
+                    if (!hasAllPermissions)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        var response = ApiResponse<object>.Forbidden($"需要以下所有权限: {string.Join(", ", requireAllPermissions.Permissions)}");
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                        return;
+                    }
+                }
+            }
 
             await _next(context);
         }

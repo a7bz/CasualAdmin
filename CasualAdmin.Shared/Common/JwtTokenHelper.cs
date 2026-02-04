@@ -98,6 +98,27 @@ public static class JwtTokenHelper
     }
 
     /// <summary>
+    /// 从JWT Token中提取权限列表
+    /// </summary>
+    /// <param name="token">JWT Token字符串</param>
+    /// <returns>权限列表</returns>
+    /// <exception cref="ArgumentNullException">当token为空时抛出</exception>
+    /// <exception cref="ArgumentException">当token无效时抛出</exception>
+    public static List<string> GetPermissionsFromToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            throw new ArgumentNullException(nameof(token));
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken)
+            throw new ArgumentException("无效的token");
+
+        var permissionClaims = jwtToken.Claims.Where(claim => claim.Type == "permission");
+        return [.. permissionClaims.Select(claim => claim.Value)];
+    }
+
+    /// <summary>
     /// 从JWT Token中提取用户信息
     /// </summary>
     /// <param name="token">JWT Token字符串</param>
@@ -126,12 +147,16 @@ public static class JwtTokenHelper
         var roleClaims = jwtToken.Claims.Where(claim => claim.Type == ClaimTypes.Role);
         var roles = roleClaims.Select(claim => claim.Value).ToList();
 
+        var permissionClaims = jwtToken.Claims.Where(claim => claim.Type == "permission");
+        var permissions = permissionClaims.Select(claim => claim.Value).ToList();
+
         return new TokenUserInfo
         {
             UserId = Guid.Parse(userIdClaim.Value),
             Email = emailClaim.Value,
             Username = usernameClaim.Value,
-            Roles = roles
+            Roles = roles,
+            Permissions = permissions
         };
     }
 

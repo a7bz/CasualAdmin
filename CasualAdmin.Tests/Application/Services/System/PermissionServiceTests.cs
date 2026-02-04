@@ -51,9 +51,9 @@ public class PermissionServiceTests
         var expectedPermission = new SysPermission
         {
             PermissionId = permissionId,
-            PermissionName = "Test Permission",
-            PermissionCode = "test.permission",
-            Remark = "Test permission description"
+            PermissionName = "用户添加权限",
+            PermissionCode = "system:user:add",
+            Remark = "添加用户权限"
         };
 
         _permissionRepositoryMock.Setup(r => r.GetByIdAsync(permissionId)).ReturnsAsync(expectedPermission);
@@ -64,9 +64,9 @@ public class PermissionServiceTests
         // Assert
         Assert.NotNull(actualPermission);
         Assert.Equal(expectedPermission.PermissionId, actualPermission.PermissionId);
-        Assert.Equal("Test Permission", actualPermission.PermissionName);
-        Assert.Equal("test.permission", actualPermission.PermissionCode);
-        Assert.Equal("Test permission description", actualPermission.Remark);
+        Assert.Equal("用户添加权限", actualPermission.PermissionName);
+        Assert.Equal("system:user:add", actualPermission.PermissionCode);
+        Assert.Equal("添加用户权限", actualPermission.Remark);
         _permissionRepositoryMock.Verify(r => r.GetByIdAsync(permissionId), Times.Once);
     }
 
@@ -79,16 +79,16 @@ public class PermissionServiceTests
         // Arrange
         var permission1 = new SysPermission
         {
-            PermissionName = "Permission 1",
-            PermissionCode = "perm.1",
-            Remark = "Permission 1 description"
+            PermissionName = "部门列表权限",
+            PermissionCode = "system:dept:list",
+            Remark = "查询部门列表权限"
         };
 
         var permission2 = new SysPermission
         {
-            PermissionName = "Permission 2",
-            PermissionCode = "perm.2",
-            Remark = "Permission 2 description"
+            PermissionName = "部门添加权限",
+            PermissionCode = "system:dept:add",
+            Remark = "添加部门权限"
         };
 
         var permissions = new List<SysPermission> { permission1, permission2 };
@@ -101,8 +101,8 @@ public class PermissionServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(permissions.Count, result.Count);
-        Assert.Equal("Permission 1", result[0].PermissionName);
-        Assert.Equal("Permission 2", result[1].PermissionName);
+        Assert.Equal("部门列表权限", result[0].PermissionName);
+        Assert.Equal("部门添加权限", result[1].PermissionName);
         _permissionRepositoryMock.Verify(r => r.GetAllAsync(), Times.Once);
     }
 
@@ -114,15 +114,15 @@ public class PermissionServiceTests
     {
         // Arrange
         var permission = new SysPermission();
-        permission.PermissionName = "New Permission";
-        permission.PermissionCode = "new.permission";
-        permission.Remark = "New permission description";
+        permission.PermissionName = "用户编辑权限";
+        permission.PermissionCode = "system:user:edit";
+        permission.Remark = "编辑用户权限";
 
         var createdPermission = new SysPermission();
         createdPermission.PermissionId = Guid.NewGuid();
-        createdPermission.PermissionName = "New Permission";
-        createdPermission.PermissionCode = "new.permission";
-        createdPermission.Remark = "New permission description";
+        createdPermission.PermissionName = "用户编辑权限";
+        createdPermission.PermissionCode = "system:user:edit";
+        createdPermission.Remark = "编辑用户权限";
 
         _permissionRepositoryMock.Setup(r => r.AddAsync(It.IsAny<SysPermission>())).ReturnsAsync(createdPermission);
 
@@ -148,21 +148,21 @@ public class PermissionServiceTests
         // Arrange
         var existingPermission = new SysPermission();
         existingPermission.PermissionId = Guid.NewGuid();
-        existingPermission.PermissionName = "Old Permission";
-        existingPermission.PermissionCode = "old.permission";
-        existingPermission.Remark = "Old permission description";
+        existingPermission.PermissionName = "用户删除权限";
+        existingPermission.PermissionCode = "system:user:delete";
+        existingPermission.Remark = "删除用户权限";
 
         var updatedPermission = new SysPermission();
         updatedPermission.PermissionId = existingPermission.PermissionId;
-        updatedPermission.PermissionName = "Updated Permission";
-        updatedPermission.PermissionCode = "updated.permission";
-        updatedPermission.Remark = "Updated permission description";
+        updatedPermission.PermissionName = "用户导出权限";
+        updatedPermission.PermissionCode = "system:user:export";
+        updatedPermission.Remark = "导出用户权限";
 
         var savedPermission = new SysPermission();
         savedPermission.PermissionId = existingPermission.PermissionId;
-        savedPermission.PermissionName = "Updated Permission";
-        savedPermission.PermissionCode = "updated.permission";
-        savedPermission.Remark = "Updated permission description";
+        savedPermission.PermissionName = "用户导出权限";
+        savedPermission.PermissionCode = "system:user:export";
+        savedPermission.Remark = "导出用户权限";
 
         _permissionRepositoryMock.Setup(r => r.GetByIdAsync(existingPermission.PermissionId)).ReturnsAsync(existingPermission);
         _permissionRepositoryMock.Setup(r => r.UpdateAsync(It.IsAny<SysPermission>())).ReturnsAsync(savedPermission);
@@ -173,8 +173,8 @@ public class PermissionServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(savedPermission.PermissionId, result.PermissionId);
-        Assert.Equal("Updated Permission", result.PermissionName);
-        Assert.Equal("updated.permission", result.PermissionCode);
+        Assert.Equal("用户导出权限", result.PermissionName);
+        Assert.Equal("system:user:export", result.PermissionCode);
         _permissionRepositoryMock.Verify(r => r.UpdateAsync(It.IsAny<SysPermission>()), Times.Once);
     }
 

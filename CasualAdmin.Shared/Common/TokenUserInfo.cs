@@ -24,4 +24,9 @@ public class TokenUserInfo
     /// 角色列表
     /// </summary>
     public List<string> Roles { get; set; } = [];
+
+    /// <summary>
+    /// 权限列表
+    /// </summary>
+    public List<string> Permissions { get; set; } = [];
 }

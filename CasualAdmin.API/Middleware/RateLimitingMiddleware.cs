@@ -1,8 +1,8 @@
 namespace CasualAdmin.API.Middleware;
+
 using System.Collections.Concurrent;
 using System.Net;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
@@ -16,44 +16,16 @@ public class RateLimitingMiddleware
     private readonly ConcurrentDictionary<string, RateLimitCounter> _rateLimitCounters;
 
     /// <summary>
-    /// 构造函数（用于中间件激活）
-    /// </summary>
-    /// <param name="next">下一个中间件</param>
-    /// <param name="logger">日志记录器</param>
-    public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-        _options = new RateLimitingOptions();
-        _rateLimitCounters = new ConcurrentDictionary<string, RateLimitCounter>();
-    }
-
-    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="next">下一个中间件</param>
     /// <param name="logger">日志记录器</param>
-    /// <param name="options">速率限制选项</param>
+    /// <param name="options">速率限制选项（可选）</param>
     public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger, RateLimitingOptions? options = null)
     {
         _next = next;
         _logger = logger;
         _options = options ?? new RateLimitingOptions();
-        _rateLimitCounters = new ConcurrentDictionary<string, RateLimitCounter>();
-    }
-
-    /// <summary>
-    /// 构造函数（用于 DI 注入）
-    /// </summary>
-    /// <param name="next">下一个中间件</param>
-    /// <param name="logger">日志记录器</param>
-    /// <param name="configuration">配置对象</param>
-    public RateLimitingMiddleware(RequestDelegate next, ILogger<RateLimitingMiddleware> logger, IConfiguration configuration)
-    {
-        _next = next;
-        _logger = logger;
-        _options = new RateLimitingOptions();
-        configuration.GetSection("RateLimiting").Bind(_options);
         _rateLimitCounters = new ConcurrentDictionary<string, RateLimitCounter>();
     }
 

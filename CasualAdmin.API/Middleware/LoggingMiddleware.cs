@@ -11,30 +11,16 @@ public class LoggingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<LoggingMiddleware> _logger;
     private readonly LoggingOptions _options;
-    private readonly IHostEnvironment _environment;
+    private readonly IHostEnvironment? _environment;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="next">下一个中间件</param>
     /// <param name="logger">日志记录器</param>
-    /// <param name="options">日志配置选项</param>
-    public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger, LoggingOptions? options = null)
-    {
-        _next = next;
-        _logger = logger;
-        _options = options ?? new LoggingOptions();
-        _environment = null!; // 默认为 null，在运行时通过 DI 解析
-    }
-
-    /// <summary>
-    /// 构造函数（用于 DI 注入）
-    /// </summary>
-    /// <param name="next">下一个中间件</param>
-    /// <param name="logger">日志记录器</param>
-    /// <param name="environment">环境信息</param>
-    /// <param name="options">日志配置选项</param>
-    public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger, IHostEnvironment environment, LoggingOptions? options = null)
+    /// <param name="environment">环境信息（可选）</param>
+    /// <param name="options">日志配置选项（可选）</param>
+    public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger, IHostEnvironment? environment = null, LoggingOptions? options = null)
     {
         _next = next;
         _logger = logger;

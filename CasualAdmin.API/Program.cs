@@ -7,6 +7,25 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+// 验证配置
+var validationResult = builder.Configuration.ValidateConfiguration();
+if (!validationResult.IsValid)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("========================================");
+    Console.WriteLine("配置验证失败，应用程序无法启动：");
+    Console.WriteLine("========================================");
+    Console.WriteLine(validationResult.GetErrorMessage());
+    Console.WriteLine("========================================");
+    Console.ResetColor();
+    Environment.Exit(1);
+    return;
+}
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("配置验证通过。");
+Console.ResetColor();
+
 // 配置端口
 var port = builder.Configuration.GetValue("Port", 5000);
 builder.WebHost.UseUrls($"http://*:{port}");

@@ -98,4 +98,11 @@ public interface IRepository<TEntity> where TEntity : class, new()
     /// <param name="entities">实体列表</param>
     /// <returns>删除的实体数量</returns>
     Task<int> DeleteRangeAsync(List<TEntity> entities);
+
+    /// <summary>
+    /// 批量删除实体（根据ID列表）
+    /// </summary>
+    /// <param name="ids">实体ID列表</param>
+    /// <returns>删除的实体数量</returns>
+    Task<int> DeleteRangeAsync(List<Guid> ids);
 }

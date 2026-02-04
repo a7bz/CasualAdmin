@@ -77,4 +77,11 @@ public interface IBaseService<TEntity> where TEntity : class, new()
     /// <param name="id">实体ID</param>
     /// <returns>删除结果</returns>
     Task<bool> DeleteAsync(Guid id);
+
+    /// <summary>
+    /// 批量删除实体（包含业务逻辑验证和处理）
+    /// </summary>
+    /// <param name="ids">实体ID列表</param>
+    /// <returns>删除结果</returns>
+    Task<bool> DeleteRangeAsync(List<Guid> ids);
 }

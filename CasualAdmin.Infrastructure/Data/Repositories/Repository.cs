@@ -356,31 +356,122 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, n
 
         if (isDeletedProperty != null && entityConfig.EnableSoftDelete)
         {
-            // 批量软删除：使用 UpdateRangeAsync
-            var now = DateTime.Now;
-            var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
+            // 批量软删除：使用条件表达式直接批量更新
+            var primaryKeyProperty = GetPrimaryKeyProperty();
+            if (primaryKeyProperty == null)
+            {
+                // 如果没有主键，回退到遍历更新
+                var currentNow = DateTime.Now;
+                var updatedAtProperty = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
 
+                foreach (var entity in entities)
+                {
+                    isDeletedProperty.SetValue(entity, true);
+                    updatedAtProperty?.SetValue(entity, currentNow);
+                }
+
+                return await _context.UpdateRangeAsync(entities);
+            }
+
+            // 提取所有主键值
+            var ids = entities.Select(e => (Guid)primaryKeyProperty.GetValue(e)!).ToList();
+            var now = DateTime.Now;
+
+            // 构建批量更新条件：WHERE id IN (id1, id2, ...)
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var propertyAccess = Expression.Property(parameter, primaryKeyProperty);
+            var containsMethod = typeof(Enumerable).GetMethods()
+                .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                .MakeGenericMethod(typeof(Guid));
+            var containsCall = Expression.Call(containsMethod, Expression.Constant(ids), propertyAccess);
+            var whereLambda = Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+
+            // 由于IDbContext接口没有提供基于条件的批量更新方法，我们使用回退方案
+            // 遍历更新每个实体
+            var updatedAtProp = _updatedAtCache.GetOrAdd(typeof(TEntity), type => type.GetProperty("UpdatedAt"));
             foreach (var entity in entities)
             {
                 isDeletedProperty.SetValue(entity, true);
-                updatedAtProperty?.SetValue(entity, now);
+                updatedAtProp?.SetValue(entity, now);
             }
 
             return await _context.UpdateRangeAsync(entities);
         }
         else
         {
-            // 批量硬删除：使用循环删除，因为 IDbContext 没有提供批量删除方法
-            int deletedCount = 0;
-            foreach (var entity in entities)
+            // 批量硬删除：使用条件表达式进行批量删除，提高性能
+            var primaryKeyProperty = GetPrimaryKeyProperty();
+            if (primaryKeyProperty == null)
             {
-                var result = await _context.DeleteAsync(entity);
-                if (result > 0)
+                // 如果没有主键，回退到循环删除
+                int deletedCount = 0;
+                foreach (var entity in entities)
+                {
+                    var result = await _context.DeleteAsync(entity);
+                    if (result > 0)
+                    {
+                        deletedCount++;
+                    }
+                }
+                return deletedCount;
+            }
+
+            // 提取所有主键值
+            var ids = entities.Select(e => (Guid)primaryKeyProperty.GetValue(e)!).ToList();
+
+            // 构建批量删除条件：WHERE id IN (id1, id2, ...)
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var propertyAccess = Expression.Property(parameter, primaryKeyProperty);
+            var containsMethod = typeof(Enumerable).GetMethods()
+                .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                .MakeGenericMethod(typeof(Guid));
+            var containsCall = Expression.Call(containsMethod, Expression.Constant(ids), propertyAccess);
+            var lambda = Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+
+            // 执行批量删除（单条 SQL：DELETE FROM table WHERE id IN (...))
+            return await _context.DeleteAsync(lambda);
+        }
+    }
+
+    /// <summary>
+    /// 批量删除实体（根据ID列表）
+    /// </summary>
+    /// <param name="ids">实体ID列表</param>
+    /// <returns>删除的实体数量</returns>
+    public async Task<int> DeleteRangeAsync(List<Guid> ids)
+    {
+        if (ids == null || ids.Count == 0)
+        {
+            return 0;
+        }
+
+        // 获取主键属性
+        var primaryKeyProperty = GetPrimaryKeyProperty();
+        if (primaryKeyProperty == null)
+        {
+            // 如果没有主键，回退到循环删除
+            int deletedCount = 0;
+            foreach (var id in ids)
+            {
+                var result = await DeleteAsync(id);
+                if (result)
                 {
                     deletedCount++;
                 }
             }
             return deletedCount;
         }
+
+        // 构建批量删除条件：WHERE id IN (id1, id2, ...)
+        var parameter = Expression.Parameter(typeof(TEntity), "e");
+        var propertyAccess = Expression.Property(parameter, primaryKeyProperty);
+        var containsMethod = typeof(Enumerable).GetMethods()
+            .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+            .MakeGenericMethod(typeof(Guid));
+        var containsCall = Expression.Call(containsMethod, Expression.Constant(ids), propertyAccess);
+        var lambda = Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+
+        // 执行批量删除（单条 SQL：DELETE FROM table WHERE id IN (...))
+        return await _context.DeleteAsync(lambda);
     }
 }

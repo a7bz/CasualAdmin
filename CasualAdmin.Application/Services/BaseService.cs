@@ -174,6 +174,39 @@ public abstract class BaseService<TEntity> : IBaseService<TEntity> where TEntity
     }
 
     /// <summary>
+    /// 批量删除实体（包含业务逻辑验证和处理）
+    /// </summary>
+    /// <param name="ids">实体ID列表</param>
+    /// <returns>删除结果</returns>
+    public virtual async Task<bool> DeleteRangeAsync(List<Guid> ids)
+    {
+        if (ids == null || ids.Count == 0)
+        {
+            return false;
+        }
+
+        // 批量删除前业务逻辑处理
+        foreach (var id in ids)
+        {
+            OnBeforeDelete(id);
+        }
+
+        // 直接调用仓储的批量删除方法（根据ID列表）
+        var deletedCount = await _repository.DeleteRangeAsync(ids);
+
+        // 批量删除后业务逻辑处理
+        if (deletedCount > 0)
+        {
+            foreach (var id in ids)
+            {
+                OnAfterDelete(id);
+            }
+        }
+
+        return deletedCount > 0;
+    }
+
+    /// <summary>
     /// 验证实体数据是否有效
     /// 默认实现，使用FluentValidation进行验证
     /// </summary>

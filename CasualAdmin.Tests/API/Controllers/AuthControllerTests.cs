@@ -36,7 +36,7 @@ public class AuthControllerTests
         _mapperMock = new Mock<IMapper>();
 
         // 设置RSA解密服务的模拟行为
-        _rsaEncryptionServiceMock.Setup(service => service.Decrypt(It.IsAny<string>())).Returns("decrypted_password");
+        _rsaEncryptionServiceMock.Setup(service => service.Decrypt(It.IsAny<string>())).Returns("Test@123");
         _rsaEncryptionServiceMock.Setup(service => service.GetPublicKey()).Returns("test_public_key");
 
         // 设置Mapper的模拟行为，将SysUser转换为SysUserDto

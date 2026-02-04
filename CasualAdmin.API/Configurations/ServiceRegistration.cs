@@ -74,8 +74,10 @@ public static class ServiceRegistration
     private static void RegisterServicesFromAssembly(IServiceCollection services, Assembly assembly)
     {
         // 只注册名称以Service结尾的类，避免注册编译器生成的类型
+        // 排除缓存服务，由专门的AddCacheService方法注册
         var serviceImplementations = assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service"));
+            .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service") && !t.Name.Contains("CacheService"));
+
 
         foreach (var implementationType in serviceImplementations)
         {

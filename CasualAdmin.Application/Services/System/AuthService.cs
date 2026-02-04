@@ -38,7 +38,17 @@ public class AuthService : IAuthService
     {
         // 获取用户角色列表
         var roles = await _roleService.GetRolesByUserIdAsync(user.UserId);
+        return await GenerateJwtToken(user, roles);
+    }
 
+    /// <summary>
+    /// 生成JWT Token（使用预查询的角色列表，避免重复查询数据库）
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <param name="roles">用户角色列表</param>
+    /// <returns>JWT Token</returns>
+    public async Task<string> GenerateJwtToken(SysUser user, List<SysRole> roles)
+    {
         // 创建基础Claims
         var claims = new List<Claim>
         {

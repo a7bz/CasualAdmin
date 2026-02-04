@@ -14,6 +14,14 @@ public interface IAuthService
     Task<string> GenerateJwtToken(SysUser user);
 
     /// <summary>
+    /// 生成JWT Token（使用预查询的角色列表，避免重复查询数据库）
+    /// </summary>
+    /// <param name="user">用户实体</param>
+    /// <param name="roles">用户角色列表</param>
+    /// <returns>JWT Token</returns>
+    Task<string> GenerateJwtToken(SysUser user, List<SysRole> roles);
+
+    /// <summary>
     /// 验证JWT Token
     /// </summary>
     /// <param name="token">JWT Token</param>

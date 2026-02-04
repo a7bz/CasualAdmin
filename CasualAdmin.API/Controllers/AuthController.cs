@@ -62,14 +62,14 @@ public class AuthController : ControllerBase
     /// <returns>用户详细信息元组</returns>
     private async Task<(string token, SysUserDto userDto, List<SysRoleDto> roleDtos, List<string> permissionKeys)> GetUserDetailsAsync(SysUser user)
     {
-        // 生成Token
-        var token = await _authService.GenerateJwtToken(user);
-
         // 将用户实体转换为DTO，避免返回嵌套的部门信息
         var userDto = _mapper.Map<SysUserDto>(user);
 
-        // 获取用户角色列表
+        // 获取用户角色列表（只查询一次）
         var roles = await _roleService.GetRolesByUserIdAsync(user.UserId);
+
+        // 使用预查询的角色列表生成Token，避免重复查询
+        var token = await _authService.GenerateJwtToken(user, roles);
 
         // 将角色列表转换为DTO，只返回必要的信息
         var roleDtos = _mapper.Map<List<SysRoleDto>>(roles);

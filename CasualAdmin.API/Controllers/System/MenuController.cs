@@ -30,6 +30,19 @@ public class MenuController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询菜单
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>菜单分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysMenuDto>>> QueryMenus([FromBody] PageRequest<SysMenuDto> request)
+    {
+        var pageResponse = await _menuService.GetPagedAsync(request.Filter, request);
+        var menuDtos = _mapper.Map<List<SysMenuDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysMenuDto>>.Success(new PageResponse<SysMenuDto>(menuDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有菜单
     /// </summary>
     /// <returns>菜单列表</returns>

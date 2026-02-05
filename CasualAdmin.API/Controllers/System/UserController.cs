@@ -30,6 +30,19 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询用户
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>用户分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysUserDto>>> QueryUsers([FromBody] PageRequest<SysUserDto> request)
+    {
+        var pageResponse = await _userService.GetPagedAsync(request.Filter, request);
+        var userDtos = _mapper.Map<List<SysUserDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysUserDto>>.Success(new PageResponse<SysUserDto>(userDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有用户
     /// </summary>
     /// <returns>用户列表</returns>

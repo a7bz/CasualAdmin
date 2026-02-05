@@ -4,6 +4,7 @@ using CasualAdmin.Application.Interfaces.Base;
 using CasualAdmin.Application.Interfaces.Events;
 using CasualAdmin.Application.Interfaces.Services;
 using CasualAdmin.Domain.Infrastructure.Data;
+using CasualAdmin.Shared.Common;
 using global::System.Linq.Expressions;
 
 /// <summary>
@@ -78,6 +79,36 @@ public abstract class BaseService<TEntity> : IBaseService<TEntity> where TEntity
     public async Task<(List<TEntity>, int)> GetPagedAsync(Expression<Func<TEntity, bool>> predicate, int page, int pageSize)
     {
         return await _repository.GetPagedAsync(predicate, page, pageSize);
+    }
+
+    /// <summary>
+    /// 通用分页查询（使用筛选器对象自动构建查询表达式）
+    /// </summary>
+    /// <typeparam name="TFilter">筛选器类型</typeparam>
+    /// <param name="filter">筛选器对象</param>
+    /// <param name="pageRequest">分页请求</param>
+    /// <returns>分页响应结果</returns>
+    public async Task<PageResponse<TEntity>> GetPagedAsync<TFilter>(TFilter filter, PageRequest pageRequest)
+        where TFilter : class, new()
+    {
+        // 使用 ExpressionBuilder 自动构建查询表达式
+        var predicate = CasualAdmin.Shared.Helpers.ExpressionBuilder.BuildPredicate<TEntity, TFilter>(filter);
+
+        // 执行分页查询
+        var (items, total) = await _repository.GetPagedAsync(predicate, pageRequest.PageIndex, pageRequest.PageSize);
+
+        // 构建排序（可选）
+        if (!string.IsNullOrWhiteSpace(pageRequest.SortField))
+        {
+            var sortProperty = CasualAdmin.Shared.Helpers.ExpressionBuilder.BuildSortProperty<TEntity>(pageRequest.SortField);
+            if (sortProperty != null)
+            {
+                // 注意：这里需要在仓储层支持排序，或者先查询再在内存中排序
+                // 当前实现暂不支持动态排序，如需支持可扩展仓储层
+            }
+        }
+
+        return new PageResponse<TEntity>(items, total, pageRequest.PageIndex, pageRequest.PageSize);
     }
 
     /// <summary>

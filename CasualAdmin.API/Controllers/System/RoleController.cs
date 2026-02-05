@@ -29,6 +29,19 @@ public class RoleController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询角色
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>角色分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysRoleDto>>> QueryRoles([FromBody] PageRequest<SysRoleDto> request)
+    {
+        var pageResponse = await _roleService.GetPagedAsync(request.Filter, request);
+        var roleDtos = _mapper.Map<List<SysRoleDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysRoleDto>>.Success(new PageResponse<SysRoleDto>(roleDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有角色
     /// </summary>
     /// <returns>角色列表</returns>

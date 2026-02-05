@@ -29,6 +29,19 @@ public class DictItemController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询字典项
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>字典项分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysDictItemDto>>> QueryDictItems([FromBody] PageRequest<SysDictItemDto> request)
+    {
+        var pageResponse = await _dictItemService.GetPagedAsync(request.Filter, request);
+        var dictItemDtos = _mapper.Map<List<SysDictItemDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysDictItemDto>>.Success(new PageResponse<SysDictItemDto>(dictItemDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有字典项
     /// </summary>
     /// <returns>字典项列表</returns>

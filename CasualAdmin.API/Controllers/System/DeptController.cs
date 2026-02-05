@@ -29,6 +29,19 @@ public class DeptController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询部门
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>部门分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysDeptDto>>> QueryDepts([FromBody] PageRequest<SysDeptDto> request)
+    {
+        var pageResponse = await _deptService.GetPagedAsync(request.Filter, request);
+        var deptDtos = _mapper.Map<List<SysDeptDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysDeptDto>>.Success(new PageResponse<SysDeptDto>(deptDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有部门
     /// </summary>
     /// <returns>部门列表</returns>

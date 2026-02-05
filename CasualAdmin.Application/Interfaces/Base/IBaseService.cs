@@ -1,4 +1,5 @@
 namespace CasualAdmin.Application.Interfaces.Base;
+using CasualAdmin.Shared.Common;
 using global::System.Linq.Expressions;
 
 /// <summary>
@@ -42,6 +43,15 @@ public interface IBaseService<TEntity> where TEntity : class, new()
     /// <param name="pageSize">每页大小</param>
     /// <returns>实体列表和总记录数</returns>
     Task<(List<TEntity>, int)> GetPagedAsync(Expression<Func<TEntity, bool>> predicate, int page, int pageSize);
+
+    /// <summary>
+    /// 通用分页查询（使用筛选器对象自动构建查询表达式）
+    /// </summary>
+    /// <typeparam name="TFilter">筛选器类型</typeparam>
+    /// <param name="filter">筛选器对象</param>
+    /// <param name="pageRequest">分页请求</param>
+    /// <returns>分页响应结果</returns>
+    Task<PageResponse<TEntity>> GetPagedAsync<TFilter>(TFilter filter, PageRequest pageRequest) where TFilter : class, new();
 
     /// <summary>
     /// 按条件计数

@@ -30,6 +30,19 @@ public class PermissionController : ControllerBase
     }
 
     /// <summary>
+    /// 分页查询权限
+    /// </summary>
+    /// <param name="request">分页请求参数（包含筛选条件）</param>
+    /// <returns>权限分页列表</returns>
+    [HttpPost("query")]
+    public async Task<ApiResponse<PageResponse<SysPermissionDto>>> QueryPermissions([FromBody] PageRequest<SysPermissionDto> request)
+    {
+        var pageResponse = await _permissionService.GetPagedAsync(request.Filter, request);
+        var permissionDtos = _mapper.Map<List<SysPermissionDto>>(pageResponse.Items);
+        return ApiResponse<PageResponse<SysPermissionDto>>.Success(new PageResponse<SysPermissionDto>(permissionDtos, pageResponse.Total, pageResponse.PageIndex, pageResponse.PageSize), "查询成功");
+    }
+
+    /// <summary>
     /// 获取所有权限
     /// </summary>
     /// <returns>权限列表</returns>

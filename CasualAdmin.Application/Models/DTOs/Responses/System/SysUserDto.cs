@@ -10,27 +10,27 @@ public class SysUserDto : BaseDto
     /// <summary>
     /// 用户ID
     /// </summary>
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     /// <summary>
     /// 用户名
     /// </summary>
-    public string Username { get; set; } = string.Empty;
+    public string? Username { get; set; }
 
     /// <summary>
     /// 真实姓名
     /// </summary>
-    public string RealName { get; set; } = string.Empty;
+    public string? RealName { get; set; }
 
     /// <summary>
     /// 邮箱
     /// </summary>
-    public string Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
     /// <summary>
     /// 手机号
     /// </summary>
-    public string Phone { get; set; } = string.Empty;
+    public string? Phone { get; set; }
 
     /// <summary>
     /// 部门ID
@@ -45,10 +45,10 @@ public class SysUserDto : BaseDto
     /// <summary>
     /// 状态
     /// </summary>
-    public Status Status { get; set; } = Status.Enabled;
+    public Status? Status { get; set; }
 
     /// <summary>
     /// 备注
     /// </summary>
-    public string Remark { get; set; } = string.Empty;
+    public string? Remark { get; set; }
 }

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_Success" xml:space="preserve">
+    <value>Operation successful</value>
+  </data>
+  <data name="Common_Failed" xml:space="preserve">
+    <value>Operation failed</value>
+  </data>
+  <data name="Common_BadRequest" xml:space="preserve">
+    <value>Bad request</value>
+  </data>
+  <data name="Common_Unauthorized" xml:space="preserve">
+    <value>Unauthorized</value>
+  </data>
+  <data name="Common_Forbidden" xml:space="preserve">
+    <value>Forbidden</value>
+  </data>
+  <data name="Common_NotFound" xml:space="preserve">
+    <value>Resource not found</value>
+  </data>
+  <data name="Auth_InvalidCredentials" xml:space="preserve">
+    <value>Invalid username or password</value>
+  </data>
+  <data name="Auth_InvalidToken" xml:space="preserve">
+    <value>Invalid or expired token</value>
+  </data>
+  <data name="Auth_RefreshTokenExpired" xml:space="preserve">
+    <value>Refresh token expired, please login again</value>
+  </data>
+  <data name="Auth_EmailAlreadyExists" xml:space="preserve">
+    <value>Email already registered</value>
+  </data>
+  <data name="Auth_UsernameAlreadyExists" xml:space="preserve">
+    <value>Username already exists</value>
+  </data>
+  <data name="Auth_InvalidEmailFormat" xml:space="preserve">
+    <value>Invalid email format</value>
+  </data>
+  <data name="Auth_PasswordTooWeak" xml:space="preserve">
+    <value>Password is too weak, must contain uppercase, lowercase, numbers and special characters, at least 8 characters</value>
+  </data>
+  <data name="Auth_LoginSuccess" xml:space="preserve">
+    <value>Login successful</value>
+  </data>
+  <data name="Auth_LogoutSuccess" xml:space="preserve">
+    <value>Logout successful</value>
+  </data>
+  <data name="Auth_RegisterSuccess" xml:space="preserve">
+    <value>Registration successful</value>
+  </data>
+  <data name="User_NotFound" xml:space="preserve">
+    <value>User not found</value>
+  </data>
+  <data name="User_CreateSuccess" xml:space="preserve">
+    <value>User created successfully</value>
+  </data>
+  <data name="User_UpdateSuccess" xml:space="preserve">
+    <value>User updated successfully</value>
+  </data>
+  <data name="User_DeleteSuccess" xml:space="preserve">
+    <value>User deleted successfully</value>
+  </data>
+  <data name="User_BatchDeleteSuccess" xml:space="preserve">
+    <value>Batch delete successful</value>
+  </data>
+  <data name="Role_NotFound" xml:space="preserve">
+    <value>Role not found</value>
+  </data>
+  <data name="Role_CreateSuccess" xml:space="preserve">
+    <value>Role created successfully</value>
+  </data>
+  <data name="Role_UpdateSuccess" xml:space="preserve">
+    <value>Role updated successfully</value>
+  </data>
+  <data name="Role_DeleteSuccess" xml:space="preserve">
+    <value>Role deleted successfully</value>
+  </data>
+  <data name="Role_AssignSuccess" xml:space="preserve">
+    <value>Role assigned successfully</value>
+  </data>
+  <data name="Permission_NotFound" xml:space="preserve">
+    <value>Permission not found</value>
+  </data>
+  <data name="Permission_CreateSuccess" xml:space="preserve">
+    <value>Permission created successfully</value>
+  </data>
+  <data name="Permission_UpdateSuccess" xml:space="preserve">
+    <value>Permission updated successfully</value>
+  </data>
+  <data name="Permission_DeleteSuccess" xml:space="preserve">
+    <value>Permission deleted successfully</value>
+  </data>
+  <data name="Menu_NotFound" xml:space="preserve">
+    <value>Menu not found</value>
+  </data>
+  <data name="Menu_CreateSuccess" xml:space="preserve">
+    <value>Menu created successfully</value>
+  </data>
+  <data name="Menu_UpdateSuccess" xml:space="preserve">
+    <value>Menu updated successfully</value>
+  </data>
+  <data name="Menu_DeleteSuccess" xml:space="preserve">
+    <value>Menu deleted successfully</value>
+  </data>
+  <data name="Dept_NotFound" xml:space="preserve">
+    <value>Department not found</value>
+  </data>
+  <data name="Dept_CreateSuccess" xml:space="preserve">
+    <value>Department created successfully</value>
+  </data>
+  <data name="Dept_UpdateSuccess" xml:space="preserve">
+    <value>Department updated successfully</value>
+  </data>
+  <data name="Dept_DeleteSuccess" xml:space="preserve">
+    <value>Department deleted successfully</value>
+  </data>
+  <data name="Dict_NotFound" xml:space="preserve">
+    <value>Dictionary not found</value>
+  </data>
+  <data name="Dict_CreateSuccess" xml:space="preserve">
+    <value>Dictionary created successfully</value>
+  </data>
+  <data name="Dict_UpdateSuccess" xml:space="preserve">
+    <value>Dictionary updated successfully</value>
+  </data>
+  <data name="Dict_DeleteSuccess" xml:space="preserve">
+    <value>Dictionary deleted successfully</value>
+  </data>
+  <data name="File_UploadSuccess" xml:space="preserve">
+    <value>File uploaded successfully</value>
+  </data>
+  <data name="File_UploadFailed" xml:space="preserve">
+    <value>File upload failed</value>
+  </data>
+  <data name="File_NotFound" xml:space="preserve">
+    <value>File not found</value>
+  </data>
+  <data name="File_InvalidFileType" xml:space="preserve">
+    <value>Unsupported file type</value>
+  </data>
+  <data name="File_FileTooLarge" xml:space="preserve">
+    <value>File size exceeds limit</value>
+  </data>
+  <data name="Validation_Required" xml:space="preserve">
+    <value>{0} is required</value>
+  </data>
+  <data name="Validation_MinLength" xml:space="preserve">
+    <value>{0} must be at least {1} characters</value>
+  </data>
+  <data name="Validation_MaxLength" xml:space="preserve">
+    <value>{0} must not exceed {1} characters</value>
+  </data>
+  <data name="Validation_Range" xml:space="preserve">
+    <value>{0} must be between {1} and {2}</value>
+  </data>
+  <data name="Validation_Email" xml:space="preserve">
+    <value>Invalid email format</value>
+  </data>
+  <data name="Validation_Url" xml:space="preserve">
+    <value>Invalid URL format</value>
+  </data>
+</root>

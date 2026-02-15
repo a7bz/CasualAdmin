@@ -39,12 +39,14 @@ builder.Services.ConfigureJwt(builder.Configuration);
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureAuthorization();
 builder.Services.ConfigureFluentValidation();
+builder.Services.ConfigureLocalization(builder.Configuration);
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
 // 配置中间件
 app.ConfigureMiddleware();
+app.UseRequestLocalization();
 app.UseSwaggerMiddleware();
 app.MapControllers();
 

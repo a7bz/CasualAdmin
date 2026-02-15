@@ -1,5 +1,7 @@
 namespace CasualAdmin.Shared.Common;
 
+using CasualAdmin.Shared.Localization;
+
 /// <summary>
 /// API响应结果
 /// </summary>
@@ -114,6 +116,103 @@ public class ApiResponse<T>
     {
         return new ApiResponse<T>(404, message, data);
     }
+
+    /// <summary>
+    /// 本地化成功响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeSuccess(ILocalizationService localizationService, string resourceKey, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(200, message, data);
+    }
+
+    /// <summary>
+    /// 本地化失败响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="code">状态码</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeFailed(ILocalizationService localizationService, string resourceKey, int code = 500, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(code, message, data);
+    }
+
+    /// <summary>
+    /// 本地化参数错误响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeBadRequest(ILocalizationService localizationService, string resourceKey, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(400, message, data);
+    }
+
+    /// <summary>
+    /// 本地化未授权响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeUnauthorized(ILocalizationService localizationService, string resourceKey, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(401, message, data);
+    }
+
+    /// <summary>
+    /// 本地化禁止访问响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeForbidden(ILocalizationService localizationService, string resourceKey, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(403, message, data);
+    }
+
+    /// <summary>
+    /// 本地化资源不存在响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="data">响应数据</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse<T> LocalizeNotFound(ILocalizationService localizationService, string resourceKey, T? data = default, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse<T>(404, message, data);
+    }
 }
 
 /// <summary>
@@ -193,6 +292,97 @@ public class ApiResponse : ApiResponse<object>
     /// <returns>API响应结果</returns>
     public static ApiResponse NotFound(string message = "资源不存在")
     {
+        return new ApiResponse(404, message);
+    }
+
+    /// <summary>
+    /// 本地化成功响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeSuccess(ILocalizationService localizationService, string resourceKey, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse(200, message);
+    }
+
+    /// <summary>
+    /// 本地化失败响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="code">状态码</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeFailed(ILocalizationService localizationService, string resourceKey, int code = 500, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse(code, message);
+    }
+
+    /// <summary>
+    /// 本地化参数错误响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeBadRequest(ILocalizationService localizationService, string resourceKey, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse(400, message);
+    }
+
+    /// <summary>
+    /// 本地化未授权响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeUnauthorized(ILocalizationService localizationService, string resourceKey, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse(401, message);
+    }
+
+    /// <summary>
+    /// 本地化禁止访问响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeForbidden(ILocalizationService localizationService, string resourceKey, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
+        return new ApiResponse(403, message);
+    }
+
+    /// <summary>
+    /// 本地化资源不存在响应
+    /// </summary>
+    /// <param name="localizationService">本地化服务</param>
+    /// <param name="resourceKey">资源键</param>
+    /// <param name="args">参数</param>
+    /// <returns>API响应结果</returns>
+    public static ApiResponse LocalizeNotFound(ILocalizationService localizationService, string resourceKey, params object[] args)
+    {
+        var message = args.Length > 0
+            ? localizationService.GetString(resourceKey, args)
+            : localizationService.GetString(resourceKey);
         return new ApiResponse(404, message);
     }
 }

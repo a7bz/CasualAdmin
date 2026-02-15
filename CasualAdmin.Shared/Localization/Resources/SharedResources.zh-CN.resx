@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_Success" xml:space="preserve">
+    <value>操作成功</value>
+  </data>
+  <data name="Common_Failed" xml:space="preserve">
+    <value>操作失败</value>
+  </data>
+  <data name="Common_BadRequest" xml:space="preserve">
+    <value>参数错误</value>
+  </data>
+  <data name="Common_Unauthorized" xml:space="preserve">
+    <value>未授权</value>
+  </data>
+  <data name="Common_Forbidden" xml:space="preserve">
+    <value>禁止访问</value>
+  </data>
+  <data name="Common_NotFound" xml:space="preserve">
+    <value>资源不存在</value>
+  </data>
+  <data name="Auth_InvalidCredentials" xml:space="preserve">
+    <value>用户名或密码错误</value>
+  </data>
+  <data name="Auth_InvalidToken" xml:space="preserve">
+    <value>令牌无效或已过期</value>
+  </data>
+  <data name="Auth_RefreshTokenExpired" xml:space="preserve">
+    <value>刷新令牌已过期，请重新登录</value>
+  </data>
+  <data name="Auth_EmailAlreadyExists" xml:space="preserve">
+    <value>邮箱已被注册</value>
+  </data>
+  <data name="Auth_UsernameAlreadyExists" xml:space="preserve">
+    <value>用户名已存在</value>
+  </data>
+  <data name="Auth_InvalidEmailFormat" xml:space="preserve">
+    <value>邮箱格式不正确</value>
+  </data>
+  <data name="Auth_PasswordTooWeak" xml:space="preserve">
+    <value>密码强度不足，必须包含大小写字母、数字和特殊字符，至少8位</value>
+  </data>
+  <data name="Auth_LoginSuccess" xml:space="preserve">
+    <value>登录成功</value>
+  </data>
+  <data name="Auth_LogoutSuccess" xml:space="preserve">
+    <value>退出成功</value>
+  </data>
+  <data name="Auth_RegisterSuccess" xml:space="preserve">
+    <value>注册成功</value>
+  </data>
+  <data name="User_NotFound" xml:space="preserve">
+    <value>用户不存在</value>
+  </data>
+  <data name="User_CreateSuccess" xml:space="preserve">
+    <value>用户创建成功</value>
+  </data>
+  <data name="User_UpdateSuccess" xml:space="preserve">
+    <value>用户更新成功</value>
+  </data>
+  <data name="User_DeleteSuccess" xml:space="preserve">
+    <value>用户删除成功</value>
+  </data>
+  <data name="User_BatchDeleteSuccess" xml:space="preserve">
+    <value>批量删除成功</value>
+  </data>
+  <data name="Role_NotFound" xml:space="preserve">
+    <value>角色不存在</value>
+  </data>
+  <data name="Role_CreateSuccess" xml:space="preserve">
+    <value>角色创建成功</value>
+  </data>
+  <data name="Role_UpdateSuccess" xml:space="preserve">
+    <value>角色更新成功</value>
+  </data>
+  <data name="Role_DeleteSuccess" xml:space="preserve">
+    <value>角色删除成功</value>
+  </data>
+  <data name="Role_AssignSuccess" xml:space="preserve">
+    <value>角色分配成功</value>
+  </data>
+  <data name="Permission_NotFound" xml:space="preserve">
+    <value>权限不存在</value>
+  </data>
+  <data name="Permission_CreateSuccess" xml:space="preserve">
+    <value>权限创建成功</value>
+  </data>
+  <data name="Permission_UpdateSuccess" xml:space="preserve">
+    <value>权限更新成功</value>
+  </data>
+  <data name="Permission_DeleteSuccess" xml:space="preserve">
+    <value>权限删除成功</value>
+  </data>
+  <data name="Menu_NotFound" xml:space="preserve">
+    <value>菜单不存在</value>
+  </data>
+  <data name="Menu_CreateSuccess" xml:space="preserve">
+    <value>菜单创建成功</value>
+  </data>
+  <data name="Menu_UpdateSuccess" xml:space="preserve">
+    <value>菜单更新成功</value>
+  </data>
+  <data name="Menu_DeleteSuccess" xml:space="preserve">
+    <value>菜单删除成功</value>
+  </data>
+  <data name="Dept_NotFound" xml:space="preserve">
+    <value>部门不存在</value>
+  </data>
+  <data name="Dept_CreateSuccess" xml:space="preserve">
+    <value>部门创建成功</value>
+  </data>
+  <data name="Dept_UpdateSuccess" xml:space="preserve">
+    <value>部门更新成功</value>
+  </data>
+  <data name="Dept_DeleteSuccess" xml:space="preserve">
+    <value>部门删除成功</value>
+  </data>
+  <data name="Dict_NotFound" xml:space="preserve">
+    <value>字典不存在</value>
+  </data>
+  <data name="Dict_CreateSuccess" xml:space="preserve">
+    <value>字典创建成功</value>
+  </data>
+  <data name="Dict_UpdateSuccess" xml:space="preserve">
+    <value>字典更新成功</value>
+  </data>
+  <data name="Dict_DeleteSuccess" xml:space="preserve">
+    <value>字典删除成功</value>
+  </data>
+  <data name="File_UploadSuccess" xml:space="preserve">
+    <value>文件上传成功</value>
+  </data>
+  <data name="File_UploadFailed" xml:space="preserve">
+    <value>文件上传失败</value>
+  </data>
+  <data name="File_NotFound" xml:space="preserve">
+    <value>文件不存在</value>
+  </data>
+  <data name="File_InvalidFileType" xml:space="preserve">
+    <value>不支持的文件类型</value>
+  </data>
+  <data name="File_FileTooLarge" xml:space="preserve">
+    <value>文件大小超过限制</value>
+  </data>
+  <data name="Validation_Required" xml:space="preserve">
+    <value>{0}不能为空</value>
+  </data>
+  <data name="Validation_MinLength" xml:space="preserve">
+    <value>{0}长度不能少于{1}个字符</value>
+  </data>
+  <data name="Validation_MaxLength" xml:space="preserve">
+    <value>{0}长度不能超过{1}个字符</value>
+  </data>
+  <data name="Validation_Range" xml:space="preserve">
+    <value>{0}必须在{1}和{2}之间</value>
+  </data>
+  <data name="Validation_Email" xml:space="preserve">
+    <value>邮箱格式不正确</value>
+  </data>
+  <data name="Validation_Url" xml:space="preserve">
+    <value>URL格式不正确</value>
+  </data>
+</root>

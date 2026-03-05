@@ -1,10 +1,10 @@
 namespace CasualAdmin.API.Services;
 
-using CasualAdmin.Shared.Localization.Resources;
-using CasualAdmin.Shared.Localization;
-using Microsoft.AspNetCore.Http;
 using System.Globalization;
 using System.Resources;
+using CasualAdmin.Shared.Localization;
+using CasualAdmin.Shared.Localization.Resources;
+using Microsoft.AspNetCore.Http;
 
 /// <summary>
 /// HTTP 本地化服务

@@ -13,17 +13,26 @@ public static class ServiceWarmupConfiguration
         var sqlSugarContext = serviceProvider.GetRequiredService<SqlSugarContext>();
         sqlSugarContext.ExecuteCodeFirst();
 
-        // 2. 预热 FluentValidation 验证器（通过程序集扫描触发加载）
+        // 2. 执行数据初始化
+        await SeedDataAsync(serviceProvider);
+
+        // 3. 预热 FluentValidation 验证器（通过程序集扫描触发加载）
         WarmupFluentValidators();
 
-        // 3. 预热 AutoMapper（触发映射配置初始化）
+        // 4. 预热 AutoMapper（触发映射配置初始化）
         WarmupAutoMapper(serviceProvider);
 
-        // 4. 预热 RSA 加密服务（单例）
+        // 5. 预热 RSA 加密服务（单例）
         WarmupRsaEncryptionService(serviceProvider);
 
-        // 5. 预热缓存服务
+        // 6. 预热缓存服务
         await WarmupCacheServiceAsync(serviceProvider);
+    }
+
+    private static async Task SeedDataAsync(IServiceProvider serviceProvider)
+    {
+        var seedService = serviceProvider.GetRequiredService<ISeedService>();
+        await seedService.SeedAsync();
     }
 
     private static void WarmupFluentValidators()
